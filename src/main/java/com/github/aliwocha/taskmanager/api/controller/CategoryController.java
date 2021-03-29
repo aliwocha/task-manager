@@ -1,13 +1,14 @@
 package com.github.aliwocha.taskmanager.api.controller;
 
+import com.github.aliwocha.taskmanager.api.dto.CategoryDto;
+import com.github.aliwocha.taskmanager.exception.IdForbiddenException;
 import com.github.aliwocha.taskmanager.service.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.net.URI;
 import java.util.List;
 
 @RestController
@@ -31,5 +32,19 @@ public class CategoryController {
         return categoryService.getCategoryName(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
+    }
+
+    @PostMapping("")
+    public ResponseEntity<?> addCategory(@RequestBody CategoryDto category) {
+        if(category.getId() != null) {
+            throw new IdForbiddenException();
+        }
+        CategoryDto savedCategory = categoryService.addCategory(category);
+        URI location = ServletUriComponentsBuilder
+                .fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(savedCategory.getId())
+                .toUri();
+        return ResponseEntity.created(location).body(savedCategory);
     }
 }

@@ -1,6 +1,7 @@
 package com.github.aliwocha.taskmanager.entity;
 
 import javax.persistence.*;
+import javax.validation.constraints.FutureOrPresent;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
@@ -14,8 +15,10 @@ public class Task {
     private Long id;
     @NotBlank(message = "Title is mandatory")
     private String title;
+    @NotNull(message = "Description cannot be null")
     @Column(length = 1024)
     private String description;
+    @NotNull(message = "Category cannot be null")
     @ManyToOne
     @JoinColumn(name = "category_id")
     private Category category;
@@ -25,6 +28,7 @@ public class Task {
     @NotNull(message = "Status cannot be null")
     @Enumerated(EnumType.STRING)
     private Status status;
+    @FutureOrPresent(message = "Date must be present or in the future")
     private LocalDate deadline;
 
     public Task() {}
@@ -83,6 +87,10 @@ public class Task {
 
     public void setDeadline(LocalDate deadline) {
         this.deadline = deadline;
+    }
+
+    public boolean isOverdue() {
+        return LocalDate.now().isAfter(this.getDeadline());
     }
 
     @Override
