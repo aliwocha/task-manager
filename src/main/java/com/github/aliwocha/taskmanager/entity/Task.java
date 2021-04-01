@@ -25,7 +25,7 @@ public class Task {
     @NotNull(message = "Priority cannot be null")
     @Enumerated(EnumType.STRING)
     private Priority priority;
-    @NotNull(message = "Status cannot be null")
+    //@NotNull(message = "Status cannot be null")
     @Enumerated(EnumType.STRING)
     private Status status;
     @FutureOrPresent(message = "Date must be present or in the future")

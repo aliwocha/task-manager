@@ -38,6 +38,20 @@ public class CategoryService {
         if(categoryByName.isPresent()) {
             throw new DuplicateCategoryNameException();
         }
+        return mapAndSaveCategory(category);
+    }
+
+    public CategoryDto updateCategory(CategoryDto category) {
+        Optional<Category> categoryByName = categoryRepository.findByNameIgnoreCase(category.getName());
+        categoryByName.ifPresent(c -> {
+            if(!c.getName().equals(category.getName())) {
+                throw new DuplicateCategoryNameException();
+            }
+        });
+        return mapAndSaveCategory(category);
+    }
+
+    private CategoryDto mapAndSaveCategory(CategoryDto category) {
         Category categoryEntity = CategoryMapper.toEntity(category);
         Category savedCategory = categoryRepository.save(categoryEntity);
         return CategoryMapper.toDto(savedCategory);

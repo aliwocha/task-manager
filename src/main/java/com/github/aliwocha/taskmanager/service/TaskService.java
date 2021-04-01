@@ -44,6 +44,18 @@ public class TaskService {
         if(categoryByName.isEmpty()) {
             throw new InvalidTaskException("Category with such name does not exist");
         }
+        return mapAndSaveTask(task);
+    }
+
+    public TaskDto updateTask(TaskDto task) { // powtarza sie
+        Optional<Category> categoryByName = categoryRepository.findByNameIgnoreCase(task.getCategory());
+        if(categoryByName.isEmpty()) {
+            throw new InvalidTaskException("Category with such name does not exist");
+        }
+        return mapAndSaveTask(task);
+    }
+
+    private TaskDto mapAndSaveTask(TaskDto task) {
         Task taskEntity = taskMapper.toEntity(task);
         Task savedTask = taskRepository.save(taskEntity);
         return TaskMapper.toDto(savedTask);

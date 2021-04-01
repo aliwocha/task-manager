@@ -2,6 +2,7 @@ package com.github.aliwocha.taskmanager.api.controller;
 
 import com.github.aliwocha.taskmanager.api.dto.CategoryDto;
 import com.github.aliwocha.taskmanager.exception.IdForbiddenException;
+import com.github.aliwocha.taskmanager.exception.IdNotMatchingException;
 import com.github.aliwocha.taskmanager.service.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -46,5 +47,14 @@ public class CategoryController {
                 .buildAndExpand(savedCategory.getId())
                 .toUri();
         return ResponseEntity.created(location).body(savedCategory);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateCategory(@RequestBody CategoryDto category, @PathVariable Long id) {
+        if(!id.equals(category.getId())) {
+            throw new IdNotMatchingException();
+        }
+        CategoryDto updatedCategory = categoryService.updateCategory(category);
+        return ResponseEntity.ok(updatedCategory);
     }
 }

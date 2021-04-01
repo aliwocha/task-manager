@@ -30,6 +30,8 @@ public class TaskMapper {
         dto.setPriority(task.getPriority());
         if(task.getDeadline() != null) {
             updateStatus(task, dto);
+        } else if(task.getStatus() == null) {
+            dto.setStatus(Task.Status.NEW);
         } else {
             dto.setStatus(task.getStatus());
         }
@@ -45,7 +47,7 @@ public class TaskMapper {
         Optional<Category> category = categoryRepository.findByNameIgnoreCase(task.getCategory());
         category.ifPresent(entity::setCategory);
         entity.setPriority(task.getPriority());
-        entity.setStatus(task.getStatus());
+        entity.setStatus(Task.Status.NEW);
         entity.setDeadline(task.getDeadline());
         return entity;
     }
@@ -53,6 +55,8 @@ public class TaskMapper {
     private static void updateStatus(Task task, TaskDto dto) {
         if(task.isOverdue() && task.getStatus() != Task.Status.COMPLETED) {
             dto.setStatus(Task.Status.OVERDUE);
+        } else if(task.getStatus() == null) {
+            dto.setStatus(Task.Status.NEW);
         } else {
             dto.setStatus(task.getStatus());
         }

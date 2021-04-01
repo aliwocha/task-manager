@@ -2,6 +2,7 @@ package com.github.aliwocha.taskmanager.api.controller;
 
 import com.github.aliwocha.taskmanager.api.dto.TaskDto;
 import com.github.aliwocha.taskmanager.exception.IdForbiddenException;
+import com.github.aliwocha.taskmanager.exception.IdNotMatchingException;
 import com.github.aliwocha.taskmanager.service.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -46,5 +47,14 @@ public class TaskController {
                 .buildAndExpand(savedTask.getId())
                 .toUri();
         return ResponseEntity.created(location).body(savedTask);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateTask(@RequestBody TaskDto task, @PathVariable Long id) {
+        if(!id.equals(task.getId())) {
+            throw new IdNotMatchingException();
+        }
+        TaskDto updatedTask = taskService.updateTask(task);
+        return ResponseEntity.ok(updatedTask);
     }
 }
