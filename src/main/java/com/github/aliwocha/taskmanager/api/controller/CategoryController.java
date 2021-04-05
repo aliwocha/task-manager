@@ -1,6 +1,7 @@
 package com.github.aliwocha.taskmanager.api.controller;
 
 import com.github.aliwocha.taskmanager.api.dto.CategoryDto;
+import com.github.aliwocha.taskmanager.api.dto.TaskDto;
 import com.github.aliwocha.taskmanager.exception.IdForbiddenException;
 import com.github.aliwocha.taskmanager.exception.IdNotMatchingException;
 import com.github.aliwocha.taskmanager.service.CategoryService;
@@ -35,6 +36,11 @@ public class CategoryController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    @GetMapping("/{categoryId}/tasks")
+    public List<TaskDto> getCategoryTasks(@PathVariable Long categoryId) {
+        return categoryService.getCategoryTasks(categoryId);
+    }
+
     @PostMapping("")
     public ResponseEntity<?> addCategory(@RequestBody CategoryDto category) {
         if(category.getId() != null) {
@@ -56,5 +62,11 @@ public class CategoryController {
         }
         CategoryDto updatedCategory = categoryService.updateCategory(category);
         return ResponseEntity.ok(updatedCategory);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteCategory(@PathVariable Long id) {
+        categoryService.deleteCategory(id);
+        return ResponseEntity.noContent().build();
     }
 }

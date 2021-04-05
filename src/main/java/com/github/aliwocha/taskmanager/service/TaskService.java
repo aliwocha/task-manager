@@ -4,6 +4,7 @@ import com.github.aliwocha.taskmanager.api.dto.TaskDto;
 import com.github.aliwocha.taskmanager.entity.Category;
 import com.github.aliwocha.taskmanager.entity.Task;
 import com.github.aliwocha.taskmanager.exception.InvalidTaskException;
+import com.github.aliwocha.taskmanager.exception.ResourceNotFoundException;
 import com.github.aliwocha.taskmanager.mapper.TaskMapper;
 import com.github.aliwocha.taskmanager.repository.CategoryRepository;
 import com.github.aliwocha.taskmanager.repository.TaskRepository;
@@ -39,25 +40,20 @@ public class TaskService {
         return taskRepository.findById(id).map(TaskMapper::toDto);
     }
 
-    public TaskDto addTask(TaskDto task) {
+    public TaskDto addOrUpdateTask(TaskDto task) {
         Optional<Category> categoryByName = categoryRepository.findByNameIgnoreCase(task.getCategory());
         if(categoryByName.isEmpty()) {
-            throw new InvalidTaskException("Category with such name does not exist");
+            throw new InvalidTaskException("Category with given name does not exist");
         }
-        return mapAndSaveTask(task);
-    }
-
-    public TaskDto updateTask(TaskDto task) { // powtarza sie
-        Optional<Category> categoryByName = categoryRepository.findByNameIgnoreCase(task.getCategory());
-        if(categoryByName.isEmpty()) {
-            throw new InvalidTaskException("Category with such name does not exist");
-        }
-        return mapAndSaveTask(task);
-    }
-
-    private TaskDto mapAndSaveTask(TaskDto task) {
         Task taskEntity = taskMapper.toEntity(task);
         Task savedTask = taskRepository.save(taskEntity);
         return TaskMapper.toDto(savedTask);
+    }
+
+    public void deleteTask(Long id) {
+        if(!taskRepository.existsById(id)) {
+            throw new ResourceNotFoundException();
+        }
+        taskRepository.deleteById(id);
     }
 }

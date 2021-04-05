@@ -40,7 +40,7 @@ public class TaskController {
         if(task.getId() != null) {
             throw new IdForbiddenException();
         }
-        TaskDto savedTask = taskService.addTask(task);
+        TaskDto savedTask = taskService.addOrUpdateTask(task);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
                 .path("/{id}")
@@ -54,7 +54,13 @@ public class TaskController {
         if(!id.equals(task.getId())) {
             throw new IdNotMatchingException();
         }
-        TaskDto updatedTask = taskService.updateTask(task);
+        TaskDto updatedTask = taskService.addOrUpdateTask(task);
         return ResponseEntity.ok(updatedTask);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteTask(@PathVariable Long id) {
+        taskService.deleteTask(id);
+        return ResponseEntity.noContent().build();
     }
 }

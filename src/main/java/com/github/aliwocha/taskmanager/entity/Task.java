@@ -28,7 +28,7 @@ public class Task {
     //@NotNull(message = "Status cannot be null")
     @Enumerated(EnumType.STRING)
     private Status status;
-    @FutureOrPresent(message = "Date must be present or in the future")
+    //@FutureOrPresent(message = "Date must be present or in the future")
     private LocalDate deadline;
 
     public Task() {}
