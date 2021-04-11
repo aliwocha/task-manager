@@ -4,7 +4,6 @@ import com.github.aliwocha.taskmanager.api.dto.TaskDto;
 import com.github.aliwocha.taskmanager.exception.IdForbiddenException;
 import com.github.aliwocha.taskmanager.exception.IdNotMatchingException;
 import com.github.aliwocha.taskmanager.service.TaskService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -16,50 +15,56 @@ import java.util.List;
 @RequestMapping("/api/tasks")
 public class TaskController {
 
-    private TaskService taskService;
+    private final TaskService taskService;
 
-    @Autowired
     public TaskController(TaskService taskService) {
         this.taskService = taskService;
     }
 
     @GetMapping("")
-    public List<TaskDto> getAllTasks() {
-        return taskService.getAllTasks();
+    public List<TaskDto> getAllTasks(@RequestParam(required = false) String status) {
+        if (status != null) {
+            return taskService.getAllTasksByStatus(status);
+        } else {
+            return taskService.getAllTasks();
+        }
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getTask(@PathVariable Long id) {
+    public ResponseEntity<TaskDto> getTask(@PathVariable Long id) {
         return taskService.getTask(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @PostMapping("")
-    public ResponseEntity<?> addTask(@RequestBody TaskDto task) {
-        if(task.getId() != null) {
+    public ResponseEntity<TaskDto> addTask(@RequestBody TaskDto task) {
+        if (task.getId() != null) {
             throw new IdForbiddenException();
         }
-        TaskDto savedTask = taskService.addOrUpdateTask(task);
+
+        TaskDto savedTask = taskService.addTask(task);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
                 .path("/{id}")
                 .buildAndExpand(savedTask.getId())
                 .toUri();
+
         return ResponseEntity.created(location).body(savedTask);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateTask(@RequestBody TaskDto task, @PathVariable Long id) {
-        if(!id.equals(task.getId())) {
+    public ResponseEntity<TaskDto> updateTask(@RequestBody TaskDto task, @PathVariable Long id) {
+        if (!id.equals(task.getId())) {
             throw new IdNotMatchingException();
         }
-        TaskDto updatedTask = taskService.addOrUpdateTask(task);
+
+        TaskDto updatedTask = taskService.updateTask(task);
         return ResponseEntity.ok(updatedTask);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteTask(@PathVariable Long id) {
+    public ResponseEntity<TaskDto> deleteTask(@PathVariable Long id) {
         taskService.deleteTask(id);
         return ResponseEntity.noContent().build();
     }

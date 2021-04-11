@@ -11,6 +11,7 @@ public class CategoryMapper {
         CategoryDto dto = new CategoryDto();
         dto.setId(category.getId());
         dto.setName(category.getName());
+
         return dto;
     }
 
@@ -18,6 +19,7 @@ public class CategoryMapper {
         Category entity = new Category();
         entity.setId(category.getId());
         entity.setName(category.getName());
+
         return entity;
     }
 }

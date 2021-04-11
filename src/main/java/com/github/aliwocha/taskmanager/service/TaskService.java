@@ -1,16 +1,16 @@
 package com.github.aliwocha.taskmanager.service;
 
 import com.github.aliwocha.taskmanager.api.dto.TaskDto;
-import com.github.aliwocha.taskmanager.entity.Category;
 import com.github.aliwocha.taskmanager.entity.Task;
 import com.github.aliwocha.taskmanager.exception.InvalidTaskException;
 import com.github.aliwocha.taskmanager.exception.ResourceNotFoundException;
 import com.github.aliwocha.taskmanager.mapper.TaskMapper;
 import com.github.aliwocha.taskmanager.repository.CategoryRepository;
 import com.github.aliwocha.taskmanager.repository.TaskRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -18,11 +18,10 @@ import java.util.stream.Collectors;
 @Service
 public class TaskService {
 
-    private TaskRepository taskRepository;
-    private TaskMapper taskMapper;
-    private CategoryRepository categoryRepository;
+    private final TaskRepository taskRepository;
+    private final TaskMapper taskMapper;
+    private final CategoryRepository categoryRepository;
 
-    @Autowired
     public TaskService(TaskRepository taskRepository, TaskMapper taskMapper, CategoryRepository categoryRepository) {
         this.taskRepository = taskRepository;
         this.taskMapper = taskMapper;
@@ -32,28 +31,67 @@ public class TaskService {
     public List<TaskDto> getAllTasks() {
         return taskRepository.findAll()
                 .stream()
-                .map(TaskMapper::toDto)
+                .map(taskMapper::toDto)
+                .collect(Collectors.toList());
+    }
+
+    public List<TaskDto> getAllTasksByStatus(String status) {
+        List<String> statusNames = Arrays.stream(Task.Status.values())
+                .map(Enum::name)
+                .collect(Collectors.toList());
+
+        if (!statusNames.contains(status.toUpperCase())) {
+            throw new InvalidTaskException("Requested status name does not exist");
+        }
+
+        return taskRepository.findAllByStatus(Task.Status.valueOf(status.toUpperCase()))
+                .stream()
+                .map(taskMapper::toDto)
                 .collect(Collectors.toList());
     }
 
     public Optional<TaskDto> getTask(Long id) {
-        return taskRepository.findById(id).map(TaskMapper::toDto);
+        return taskRepository.findById(id).map(taskMapper::toDto);
     }
 
-    public TaskDto addOrUpdateTask(TaskDto task) {
-        Optional<Category> categoryByName = categoryRepository.findByNameIgnoreCase(task.getCategory());
-        if(categoryByName.isEmpty()) {
-            throw new InvalidTaskException("Category with given name does not exist");
+    public TaskDto addTask(TaskDto task) {
+        categoryRepository.findByNameIgnoreCase(task.getCategory())
+                .orElseThrow(() -> new InvalidTaskException("Category with given name does not exist"));
+
+        if (task.getDeadline() != null && task.getDeadline().isBefore(LocalDate.now())) {
+            throw new InvalidTaskException("Date must be present or in the future");
         }
+
+        task.setStatus(Task.Status.NEW);
+        return mapAndSaveTask(task);
+    }
+
+    public TaskDto updateTask(TaskDto task) {
+        categoryRepository.findByNameIgnoreCase(task.getCategory())
+                .orElseThrow(() -> new InvalidTaskException("Category with given name does not exist"));
+
+        if (task.getDeadline() != null && task.getDeadline().isBefore(LocalDate.now())) {
+            throw new InvalidTaskException("Date must be present or in the future");
+        }
+
+        if (task.getStatus() == Task.Status.OVERDUE) {
+            throw new InvalidTaskException("Status cannot be set to 'OVERDUE'");
+        }
+
+        return mapAndSaveTask(task);
+    }
+
+    private TaskDto mapAndSaveTask(TaskDto task) {
         Task taskEntity = taskMapper.toEntity(task);
         Task savedTask = taskRepository.save(taskEntity);
-        return TaskMapper.toDto(savedTask);
+        return taskMapper.toDto(savedTask);
     }
 
     public void deleteTask(Long id) {
-        if(!taskRepository.existsById(id)) {
+        if (!taskRepository.existsById(id)) {
             throw new ResourceNotFoundException();
         }
+
         taskRepository.deleteById(id);
     }
 }

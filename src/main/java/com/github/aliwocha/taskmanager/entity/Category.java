@@ -18,7 +18,8 @@ public class Category {
     @OneToMany(mappedBy = "category")
     private List<Task> tasks = new ArrayList<>();
 
-    public Category() {}
+    public Category() {
+    }
 
     public Long getId() {
         return id;

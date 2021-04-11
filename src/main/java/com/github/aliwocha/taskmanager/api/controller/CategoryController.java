@@ -5,7 +5,6 @@ import com.github.aliwocha.taskmanager.api.dto.TaskDto;
 import com.github.aliwocha.taskmanager.exception.IdForbiddenException;
 import com.github.aliwocha.taskmanager.exception.IdNotMatchingException;
 import com.github.aliwocha.taskmanager.service.CategoryService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -17,9 +16,8 @@ import java.util.List;
 @RequestMapping("/api/categories")
 public class CategoryController {
 
-    private CategoryService categoryService;
+    private final CategoryService categoryService;
 
-    @Autowired
     public CategoryController(CategoryService categoryService) {
         this.categoryService = categoryService;
     }
@@ -30,7 +28,7 @@ public class CategoryController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getCategoryName(@PathVariable Long id) {
+    public ResponseEntity<String> getCategoryName(@PathVariable Long id) {
         return categoryService.getCategoryName(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
@@ -42,30 +40,33 @@ public class CategoryController {
     }
 
     @PostMapping("")
-    public ResponseEntity<?> addCategory(@RequestBody CategoryDto category) {
-        if(category.getId() != null) {
+    public ResponseEntity<CategoryDto> addCategory(@RequestBody CategoryDto category) {
+        if (category.getId() != null) {
             throw new IdForbiddenException();
         }
+
         CategoryDto savedCategory = categoryService.addCategory(category);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
                 .path("/{id}")
                 .buildAndExpand(savedCategory.getId())
                 .toUri();
+
         return ResponseEntity.created(location).body(savedCategory);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateCategory(@RequestBody CategoryDto category, @PathVariable Long id) {
-        if(!id.equals(category.getId())) {
+    public ResponseEntity<CategoryDto> updateCategory(@RequestBody CategoryDto category, @PathVariable Long id) {
+        if (!id.equals(category.getId())) {
             throw new IdNotMatchingException();
         }
+
         CategoryDto updatedCategory = categoryService.updateCategory(category);
         return ResponseEntity.ok(updatedCategory);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteCategory(@PathVariable Long id) {
+    public ResponseEntity<CategoryDto> deleteCategory(@PathVariable Long id) {
         categoryService.deleteCategory(id);
         return ResponseEntity.noContent().build();
     }

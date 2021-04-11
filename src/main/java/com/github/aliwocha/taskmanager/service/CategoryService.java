@@ -3,13 +3,13 @@ package com.github.aliwocha.taskmanager.service;
 import com.github.aliwocha.taskmanager.api.dto.CategoryDto;
 import com.github.aliwocha.taskmanager.api.dto.TaskDto;
 import com.github.aliwocha.taskmanager.entity.Category;
+import com.github.aliwocha.taskmanager.exception.CategoryForbiddenException;
 import com.github.aliwocha.taskmanager.exception.DuplicateCategoryException;
 import com.github.aliwocha.taskmanager.exception.ResourceNotFoundException;
 import com.github.aliwocha.taskmanager.mapper.CategoryMapper;
 import com.github.aliwocha.taskmanager.mapper.TaskMapper;
 import com.github.aliwocha.taskmanager.repository.CategoryRepository;
 import com.github.aliwocha.taskmanager.repository.TaskRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -21,13 +21,16 @@ import java.util.stream.Collectors;
 @Service
 public class CategoryService {
 
-    private CategoryRepository categoryRepository;
-    private TaskRepository taskRepository;
+    private final CategoryRepository categoryRepository;
+    private final TaskRepository taskRepository;
+    private final TaskMapper taskMapper;
 
-    @Autowired
-    public CategoryService(CategoryRepository categoryRepository, TaskRepository taskRepository) {
+    private final String DEFAULT_CATEGORY_NAME = "No category";
+
+    public CategoryService(CategoryRepository categoryRepository, TaskRepository taskRepository, TaskMapper taskMapper) {
         this.categoryRepository = categoryRepository;
         this.taskRepository = taskRepository;
+        this.taskMapper = taskMapper;
     }
 
     public List<String> getAllNames() {
@@ -46,25 +49,34 @@ public class CategoryService {
                 .map(Category::getTasks)
                 .orElseThrow(ResourceNotFoundException::new)
                 .stream()
-                .map(TaskMapper::toDto)
+                .map(taskMapper::toDto)
                 .collect(Collectors.toList());
     }
 
     public CategoryDto addCategory(CategoryDto category) {
         Optional<Category> categoryByName = categoryRepository.findByNameIgnoreCase(category.getName());
-        if(categoryByName.isPresent()) {
+        if (categoryByName.isPresent()) {
             throw new DuplicateCategoryException();
         }
+
         return mapAndSaveCategory(category);
     }
 
     public CategoryDto updateCategory(CategoryDto category) {
         Optional<Category> categoryByName = categoryRepository.findByNameIgnoreCase(category.getName());
         categoryByName.ifPresent(c -> {
-            if(!c.getName().equals(category.getName())) {
+            if (!c.getId().equals(category.getId())) {
                 throw new DuplicateCategoryException();
             }
         });
+
+        Optional<Category> categoryById = categoryRepository.findById(category.getId());
+        categoryById.ifPresent(c -> {
+            if (c.getName().equals(DEFAULT_CATEGORY_NAME)) {
+                throw new CategoryForbiddenException("This category cannot be updated");
+            }
+        });
+
         return mapAndSaveCategory(category);
     }
 
@@ -75,12 +87,10 @@ public class CategoryService {
     }
 
     public void deleteCategory(Long id) {
-        Optional<Category> category = categoryRepository.findById(id);
-        if(category.isEmpty()) {
-            throw new ResourceNotFoundException();
-        }
-        if(category.get().getName().equals("No category")) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "This category cannot be deleted");
+        Category category = categoryRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
+
+        if (category.getName().equals(DEFAULT_CATEGORY_NAME)) {
+            throw new CategoryForbiddenException("This category cannot be deleted");
         }
 
         updateTasksBeforeDelete(id);
@@ -88,11 +98,11 @@ public class CategoryService {
     }
 
     private void updateTasksBeforeDelete(Long id) {
-        categoryRepository.findByNameIgnoreCase("No category")
-                .ifPresent(c -> taskRepository.findAllByCategory_Id(id)
-                        .forEach(task -> {
-                            task.setCategory(c);
-                            taskRepository.save(task);
-                        }));
+        Category defaultCategory = categoryRepository.findByNameIgnoreCase(DEFAULT_CATEGORY_NAME)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
+                        "Default category 'No category' not found. Create first a default category with given name"));
+
+        taskRepository.findAllByCategory_Id(id)
+                .forEach(task -> task.setCategory(defaultCategory));
     }
 }

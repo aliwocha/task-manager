@@ -1,7 +1,6 @@
 package com.github.aliwocha.taskmanager.entity;
 
 import javax.persistence.*;
-import javax.validation.constraints.FutureOrPresent;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
@@ -25,13 +24,13 @@ public class Task {
     @NotNull(message = "Priority cannot be null")
     @Enumerated(EnumType.STRING)
     private Priority priority;
-    //@NotNull(message = "Status cannot be null")
+    @NotNull(message = "Status cannot be null")
     @Enumerated(EnumType.STRING)
     private Status status;
-    //@FutureOrPresent(message = "Date must be present or in the future")
     private LocalDate deadline;
 
-    public Task() {}
+    public Task() {
+    }
 
     public Long getId() {
         return id;
