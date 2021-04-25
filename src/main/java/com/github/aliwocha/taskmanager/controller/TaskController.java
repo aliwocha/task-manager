@@ -1,9 +1,9 @@
-package com.github.aliwocha.taskmanager.api.controller;
+package com.github.aliwocha.taskmanager.controller;
 
-import com.github.aliwocha.taskmanager.api.dto.TaskDto;
+import com.github.aliwocha.taskmanager.dto.TaskDto;
 import com.github.aliwocha.taskmanager.exception.IdForbiddenException;
 import com.github.aliwocha.taskmanager.exception.IdNotMatchingException;
-import com.github.aliwocha.taskmanager.service.TaskService;
+import com.github.aliwocha.taskmanager.service.task.TaskServiceImpl;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -15,9 +15,9 @@ import java.util.List;
 @RequestMapping("/api/tasks")
 public class TaskController {
 
-    private final TaskService taskService;
+    private final TaskServiceImpl taskService;
 
-    public TaskController(TaskService taskService) {
+    public TaskController(TaskServiceImpl taskService) {
         this.taskService = taskService;
     }
 

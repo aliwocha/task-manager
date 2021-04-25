@@ -12,9 +12,11 @@ public class Category {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @NotBlank(message = "Category name is mandatory")
     @Column(unique = true)
     private String name;
+
     @OneToMany(mappedBy = "category")
     private List<Task> tasks = new ArrayList<>();
 

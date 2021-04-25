@@ -1,7 +1,7 @@
-package com.github.aliwocha.taskmanager.service;
+package com.github.aliwocha.taskmanager.service.category;
 
-import com.github.aliwocha.taskmanager.api.dto.CategoryDto;
-import com.github.aliwocha.taskmanager.api.dto.TaskDto;
+import com.github.aliwocha.taskmanager.dto.CategoryDto;
+import com.github.aliwocha.taskmanager.dto.TaskDto;
 import com.github.aliwocha.taskmanager.entity.Category;
 import com.github.aliwocha.taskmanager.exception.CategoryForbiddenException;
 import com.github.aliwocha.taskmanager.exception.DuplicateCategoryException;
@@ -19,7 +19,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
-public class CategoryService {
+public class CategoryServiceImpl implements CategoryService {
 
     private final CategoryRepository categoryRepository;
     private final TaskRepository taskRepository;
@@ -27,7 +27,7 @@ public class CategoryService {
 
     private final String DEFAULT_CATEGORY_NAME = "No category";
 
-    public CategoryService(CategoryRepository categoryRepository, TaskRepository taskRepository, TaskMapper taskMapper) {
+    public CategoryServiceImpl(CategoryRepository categoryRepository, TaskRepository taskRepository, TaskMapper taskMapper) {
         this.categoryRepository = categoryRepository;
         this.taskRepository = taskRepository;
         this.taskMapper = taskMapper;

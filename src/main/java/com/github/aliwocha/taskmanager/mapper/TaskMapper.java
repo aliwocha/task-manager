@@ -1,6 +1,6 @@
 package com.github.aliwocha.taskmanager.mapper;
 
-import com.github.aliwocha.taskmanager.api.dto.TaskDto;
+import com.github.aliwocha.taskmanager.dto.TaskDto;
 import com.github.aliwocha.taskmanager.entity.Category;
 import com.github.aliwocha.taskmanager.entity.Task;
 import com.github.aliwocha.taskmanager.repository.CategoryRepository;

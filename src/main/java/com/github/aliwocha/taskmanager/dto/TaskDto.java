@@ -1,4 +1,4 @@
-package com.github.aliwocha.taskmanager.api.dto;
+package com.github.aliwocha.taskmanager.dto;
 
 import com.github.aliwocha.taskmanager.entity.Task;
 

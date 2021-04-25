@@ -1,10 +1,10 @@
-package com.github.aliwocha.taskmanager.api.controller;
+package com.github.aliwocha.taskmanager.controller;
 
-import com.github.aliwocha.taskmanager.api.dto.CategoryDto;
-import com.github.aliwocha.taskmanager.api.dto.TaskDto;
+import com.github.aliwocha.taskmanager.dto.CategoryDto;
+import com.github.aliwocha.taskmanager.dto.TaskDto;
 import com.github.aliwocha.taskmanager.exception.IdForbiddenException;
 import com.github.aliwocha.taskmanager.exception.IdNotMatchingException;
-import com.github.aliwocha.taskmanager.service.CategoryService;
+import com.github.aliwocha.taskmanager.service.category.CategoryServiceImpl;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -16,9 +16,9 @@ import java.util.List;
 @RequestMapping("/api/categories")
 public class CategoryController {
 
-    private final CategoryService categoryService;
+    private final CategoryServiceImpl categoryService;
 
-    public CategoryController(CategoryService categoryService) {
+    public CategoryController(CategoryServiceImpl categoryService) {
         this.categoryService = categoryService;
     }
 

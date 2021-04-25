@@ -1,6 +1,6 @@
-package com.github.aliwocha.taskmanager.service;
+package com.github.aliwocha.taskmanager.service.task;
 
-import com.github.aliwocha.taskmanager.api.dto.TaskDto;
+import com.github.aliwocha.taskmanager.dto.TaskDto;
 import com.github.aliwocha.taskmanager.entity.Task;
 import com.github.aliwocha.taskmanager.exception.InvalidTaskException;
 import com.github.aliwocha.taskmanager.exception.ResourceNotFoundException;
@@ -16,13 +16,13 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
-public class TaskService {
+public class TaskServiceImpl implements TaskService {
 
     private final TaskRepository taskRepository;
     private final TaskMapper taskMapper;
     private final CategoryRepository categoryRepository;
 
-    public TaskService(TaskRepository taskRepository, TaskMapper taskMapper, CategoryRepository categoryRepository) {
+    public TaskServiceImpl(TaskRepository taskRepository, TaskMapper taskMapper, CategoryRepository categoryRepository) {
         this.taskRepository = taskRepository;
         this.taskMapper = taskMapper;
         this.categoryRepository = categoryRepository;

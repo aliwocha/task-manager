@@ -1,6 +1,6 @@
 package com.github.aliwocha.taskmanager.mapper;
 
-import com.github.aliwocha.taskmanager.api.dto.CategoryDto;
+import com.github.aliwocha.taskmanager.dto.CategoryDto;
 import com.github.aliwocha.taskmanager.entity.Category;
 import org.springframework.stereotype.Component;
 

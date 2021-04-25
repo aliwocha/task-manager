@@ -12,21 +12,25 @@ public class Task {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @NotBlank(message = "Title is mandatory")
     private String title;
     @NotNull(message = "Description cannot be null")
     @Column(length = 1024)
     private String description;
+
     @NotNull(message = "Category cannot be null")
     @ManyToOne
     @JoinColumn(name = "category_id")
     private Category category;
+
     @NotNull(message = "Priority cannot be null")
     @Enumerated(EnumType.STRING)
     private Priority priority;
     @NotNull(message = "Status cannot be null")
     @Enumerated(EnumType.STRING)
     private Status status;
+
     private LocalDate deadline;
 
     public Task() {
