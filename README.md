@@ -34,7 +34,7 @@ Functionalities to be implemented:
 
 2. Go to the main folder of the project and run this command:
 
-* for the Unix system (or Git Bash):
+* for the Unix system:
 ```
 ./mvnw spring-boot:run
 ```
