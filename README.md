@@ -13,7 +13,6 @@ Functionalities implemented so far:
 * integration with H2 database
 
 Functionalities to be implemented:
-* endpoints with CRUD methods for User entity
 * pagination
 * authentication provided by Spring Security
 * unit tests

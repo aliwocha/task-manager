@@ -5,6 +5,7 @@ import javax.validation.constraints.NotBlank;
 import java.util.Objects;
 
 @Entity
+@Table(name = "roles")
 public class Role {
 
     @Id

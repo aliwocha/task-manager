@@ -1,4 +1,13 @@
-INSERT into category(id, name) VALUES
+INSERT into roles(id, name) VALUES
+    (1, 'user'),
+    (2, 'admin');
+
+INSERT into users(id, login, password, role_id) VALUES
+    (1, 'user1', '123456', 1),
+    (2, 'user2', 'abc123', 1),
+    (3, 'admin', 'admin123', 2);
+
+INSERT into categories(id, name) VALUES
     (1, 'No category'),
     (2, 'Personal'),
     (3, 'Home'),
@@ -8,7 +17,7 @@ INSERT into category(id, name) VALUES
     (7, 'Health'),
     (8, 'Travel');
 
-INSERT into task(id, title, description, priority, status, deadline, category_id) VALUES
+INSERT into tasks(id, title, description, priority, status, deadline, category_id) VALUES
     (1, 'Zrobić zakupy', 'Spodnie, buty, sweter', 'LOW', 'NEW', null, 6),
     (2, 'Pomalować ściany', '', 'MEDIUM', 'NEW', '2021-03-30', 3),
     (3, 'Stworzyć aplikację', 'Aplikacja To-Do List', 'HIGH', 'IN_PROGRESS', '2021-04-10', 4),
