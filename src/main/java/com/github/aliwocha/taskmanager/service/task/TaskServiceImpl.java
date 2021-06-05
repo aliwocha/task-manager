@@ -28,6 +28,7 @@ public class TaskServiceImpl implements TaskService {
         this.categoryRepository = categoryRepository;
     }
 
+    @Override
     public List<TaskDto> getAllTasks() {
         return taskRepository.findAll()
                 .stream()
@@ -35,6 +36,7 @@ public class TaskServiceImpl implements TaskService {
                 .collect(Collectors.toList());
     }
 
+    @Override
     public List<TaskDto> getAllTasksByStatus(String status) {
         List<String> statusNames = Arrays.stream(Task.Status.values())
                 .map(Enum::name)
@@ -50,10 +52,12 @@ public class TaskServiceImpl implements TaskService {
                 .collect(Collectors.toList());
     }
 
+    @Override
     public Optional<TaskDto> getTask(Long id) {
         return taskRepository.findById(id).map(taskMapper::toDto);
     }
 
+    @Override
     public TaskDto addTask(TaskDto task) {
         categoryRepository.findByNameIgnoreCase(task.getCategory())
                 .orElseThrow(() -> new InvalidTaskException("Category with given name does not exist"));
@@ -66,6 +70,7 @@ public class TaskServiceImpl implements TaskService {
         return mapAndSaveTask(task);
     }
 
+    @Override
     public TaskDto updateTask(TaskDto task) {
         categoryRepository.findByNameIgnoreCase(task.getCategory())
                 .orElseThrow(() -> new InvalidTaskException("Category with given name does not exist"));
@@ -87,6 +92,7 @@ public class TaskServiceImpl implements TaskService {
         return taskMapper.toDto(savedTask);
     }
 
+    @Override
     public void deleteTask(Long id) {
         if (!taskRepository.existsById(id)) {
             throw new ResourceNotFoundException();

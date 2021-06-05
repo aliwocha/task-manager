@@ -1,7 +1,9 @@
 package com.github.aliwocha.taskmanager.entity;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.util.Objects;
 
 @Entity
@@ -11,7 +13,12 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank(message = "Login is mandatory")
+    @Column(unique = true)
     private String login;
+
+    @NotBlank(message = "Password is mandatory")
+    @Size(min = 6, message = "Password must have minimum 6 characters")
     private String password;
 
     @NotNull(message = "Role cannot be null")
@@ -59,7 +66,8 @@ public class User {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         User user = (User) o;
-        return Objects.equals(id, user.id) && Objects.equals(login, user.login) && Objects.equals(password, user.password) && Objects.equals(role, user.role);
+        return Objects.equals(id, user.id) && Objects.equals(login, user.login) && Objects.equals(password, user.password)
+                && Objects.equals(role, user.role);
     }
 
     @Override

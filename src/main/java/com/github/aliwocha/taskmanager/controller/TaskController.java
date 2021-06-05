@@ -12,7 +12,7 @@ import java.net.URI;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/tasks")
+@RequestMapping("/tasks")
 public class TaskController {
 
     private final TaskServiceImpl taskService;
@@ -21,7 +21,7 @@ public class TaskController {
         this.taskService = taskService;
     }
 
-    @GetMapping("")
+    @GetMapping
     public List<TaskDto> getAllTasks(@RequestParam(required = false) String status) {
         if (status != null) {
             return taskService.getAllTasksByStatus(status);
@@ -37,7 +37,7 @@ public class TaskController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @PostMapping("")
+    @PostMapping
     public ResponseEntity<TaskDto> addTask(@RequestBody TaskDto task) {
         if (task.getId() != null) {
             throw new IdForbiddenException();

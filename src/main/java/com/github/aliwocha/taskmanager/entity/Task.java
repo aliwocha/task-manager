@@ -15,6 +15,7 @@ public class Task {
 
     @NotBlank(message = "Title is mandatory")
     private String title;
+
     @NotNull(message = "Description cannot be null")
     @Column(length = 1024)
     private String description;
@@ -27,6 +28,7 @@ public class Task {
     @NotNull(message = "Priority cannot be null")
     @Enumerated(EnumType.STRING)
     private Priority priority;
+
     @NotNull(message = "Status cannot be null")
     @Enumerated(EnumType.STRING)
     private Status status;

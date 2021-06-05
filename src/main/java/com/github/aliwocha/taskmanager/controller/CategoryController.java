@@ -13,7 +13,7 @@ import java.net.URI;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/categories")
+@RequestMapping("/categories")
 public class CategoryController {
 
     private final CategoryServiceImpl categoryService;
@@ -39,7 +39,7 @@ public class CategoryController {
         return categoryService.getCategoryTasks(categoryId);
     }
 
-    @PostMapping("")
+    @PostMapping
     public ResponseEntity<CategoryDto> addCategory(@RequestBody CategoryDto category) {
         if (category.getId() != null) {
             throw new IdForbiddenException();

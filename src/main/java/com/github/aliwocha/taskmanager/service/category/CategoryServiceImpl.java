@@ -33,6 +33,7 @@ public class CategoryServiceImpl implements CategoryService {
         this.taskMapper = taskMapper;
     }
 
+    @Override
     public List<String> getAllNames() {
         return categoryRepository.findAll()
                 .stream()
@@ -40,10 +41,12 @@ public class CategoryServiceImpl implements CategoryService {
                 .collect(Collectors.toList());
     }
 
+    @Override
     public Optional<String> getCategoryName(Long id) {
         return categoryRepository.findById(id).map(Category::getName);
     }
 
+    @Override
     public List<TaskDto> getCategoryTasks(Long categoryId) {
         return categoryRepository.findById(categoryId)
                 .map(Category::getTasks)
@@ -53,6 +56,7 @@ public class CategoryServiceImpl implements CategoryService {
                 .collect(Collectors.toList());
     }
 
+    @Override
     public CategoryDto addCategory(CategoryDto category) {
         Optional<Category> categoryByName = categoryRepository.findByNameIgnoreCase(category.getName());
         if (categoryByName.isPresent()) {
@@ -62,6 +66,7 @@ public class CategoryServiceImpl implements CategoryService {
         return mapAndSaveCategory(category);
     }
 
+    @Override
     public CategoryDto updateCategory(CategoryDto category) {
         Optional<Category> categoryByName = categoryRepository.findByNameIgnoreCase(category.getName());
         categoryByName.ifPresent(c -> {
@@ -86,6 +91,7 @@ public class CategoryServiceImpl implements CategoryService {
         return CategoryMapper.toDto(savedCategory);
     }
 
+    @Override
     public void deleteCategory(Long id) {
         Category category = categoryRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
 
