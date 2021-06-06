@@ -22,8 +22,8 @@ public class UserController {
     }
 
     @GetMapping
-    public List<UserDto> getAllUsers() {
-        return userService.getAllUsers();
+    public ResponseEntity<List<UserDto>> getAllUsers() {
+        return ResponseEntity.ok(userService.getAllUsers());
     }
 
     @GetMapping("/{id}")
@@ -55,8 +55,7 @@ public class UserController {
             throw new IdNotMatchingException();
         }
 
-        UserDto updatedUser = userService.updateUser(user);
-        return ResponseEntity.ok(updatedUser);
+        return ResponseEntity.ok(userService.updateUser(user));
     }
 
     @DeleteMapping("/{id}")

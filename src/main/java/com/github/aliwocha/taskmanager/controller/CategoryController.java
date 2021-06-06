@@ -23,8 +23,8 @@ public class CategoryController {
     }
 
     @GetMapping("/names")
-    public List<String> getAllNames() {
-        return categoryService.getAllNames();
+    public ResponseEntity<List<String>> getAllNames() {
+        return ResponseEntity.ok(categoryService.getAllNames());
     }
 
     @GetMapping("/{id}")
@@ -35,8 +35,8 @@ public class CategoryController {
     }
 
     @GetMapping("/{categoryId}/tasks")
-    public List<TaskDto> getCategoryTasks(@PathVariable Long categoryId) {
-        return categoryService.getCategoryTasks(categoryId);
+    public ResponseEntity<List<TaskDto>> getCategoryTasks(@PathVariable Long categoryId) {
+        return ResponseEntity.ok(categoryService.getCategoryTasks(categoryId));
     }
 
     @PostMapping
@@ -61,8 +61,7 @@ public class CategoryController {
             throw new IdNotMatchingException();
         }
 
-        CategoryDto updatedCategory = categoryService.updateCategory(category);
-        return ResponseEntity.ok(updatedCategory);
+        return ResponseEntity.ok(categoryService.updateCategory(category));
     }
 
     @DeleteMapping("/{id}")

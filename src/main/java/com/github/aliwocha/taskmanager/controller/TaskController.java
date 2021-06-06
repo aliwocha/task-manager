@@ -22,11 +22,11 @@ public class TaskController {
     }
 
     @GetMapping
-    public List<TaskDto> getAllTasks(@RequestParam(required = false) String status) {
+    public ResponseEntity<List<TaskDto>> getAllTasks(@RequestParam(required = false) String status) {
         if (status != null) {
-            return taskService.getAllTasksByStatus(status);
+            return ResponseEntity.ok(taskService.getAllTasksByStatus(status));
         } else {
-            return taskService.getAllTasks();
+            return ResponseEntity.ok(taskService.getAllTasks());
         }
     }
 
@@ -59,8 +59,7 @@ public class TaskController {
             throw new IdNotMatchingException();
         }
 
-        TaskDto updatedTask = taskService.updateTask(task);
-        return ResponseEntity.ok(updatedTask);
+        return ResponseEntity.ok(taskService.updateTask(task));
     }
 
     @DeleteMapping("/{id}")
