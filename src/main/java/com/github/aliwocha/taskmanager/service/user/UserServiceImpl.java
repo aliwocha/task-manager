@@ -2,9 +2,11 @@ package com.github.aliwocha.taskmanager.service.user;
 
 import com.github.aliwocha.taskmanager.dto.UserDto;
 import com.github.aliwocha.taskmanager.entity.User;
-import com.github.aliwocha.taskmanager.exception.DuplicateUserException;
-import com.github.aliwocha.taskmanager.exception.ResourceNotFoundException;
+import com.github.aliwocha.taskmanager.exception.user.DuplicateUserException;
+import com.github.aliwocha.taskmanager.exception.general.ResourceNotFoundException;
+import com.github.aliwocha.taskmanager.exception.user.InvalidUserException;
 import com.github.aliwocha.taskmanager.mapper.UserMapper;
+import com.github.aliwocha.taskmanager.repository.RoleRepository;
 import com.github.aliwocha.taskmanager.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
@@ -17,10 +19,12 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final RoleRepository roleRepository;
 
-    public UserServiceImpl(UserRepository userRepository, UserMapper userMapper) {
+    public UserServiceImpl(UserRepository userRepository, UserMapper userMapper, RoleRepository roleRepository) {
         this.userRepository = userRepository;
         this.userMapper = userMapper;
+        this.roleRepository = roleRepository;
     }
 
     @Override
@@ -43,6 +47,9 @@ public class UserServiceImpl implements UserService {
             throw new DuplicateUserException();
         }
 
+        roleRepository.findByNameIgnoreCase(user.getRole())
+                .orElseThrow(() -> new InvalidUserException("Role with given name does not exist"));
+
         return mapAndSaveUser(user);
     }
 
@@ -54,6 +61,9 @@ public class UserServiceImpl implements UserService {
                 throw new DuplicateUserException();
             }
         });
+
+        roleRepository.findByNameIgnoreCase(user.getRole())
+                .orElseThrow(() -> new InvalidUserException("Role with given name does not exist"));
 
         return mapAndSaveUser(user);
     }

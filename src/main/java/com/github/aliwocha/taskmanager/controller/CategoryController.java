@@ -2,8 +2,8 @@ package com.github.aliwocha.taskmanager.controller;
 
 import com.github.aliwocha.taskmanager.dto.CategoryDto;
 import com.github.aliwocha.taskmanager.dto.TaskDto;
-import com.github.aliwocha.taskmanager.exception.IdForbiddenException;
-import com.github.aliwocha.taskmanager.exception.IdNotMatchingException;
+import com.github.aliwocha.taskmanager.exception.general.IdForbiddenException;
+import com.github.aliwocha.taskmanager.exception.general.IdNotMatchingException;
 import com.github.aliwocha.taskmanager.service.category.CategoryServiceImpl;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

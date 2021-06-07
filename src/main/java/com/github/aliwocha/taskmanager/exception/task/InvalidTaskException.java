@@ -1,4 +1,4 @@
-package com.github.aliwocha.taskmanager.exception;
+package com.github.aliwocha.taskmanager.exception.task;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;

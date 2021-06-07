@@ -2,8 +2,8 @@ package com.github.aliwocha.taskmanager.service.task;
 
 import com.github.aliwocha.taskmanager.dto.TaskDto;
 import com.github.aliwocha.taskmanager.entity.Task;
-import com.github.aliwocha.taskmanager.exception.InvalidTaskException;
-import com.github.aliwocha.taskmanager.exception.ResourceNotFoundException;
+import com.github.aliwocha.taskmanager.exception.task.InvalidTaskException;
+import com.github.aliwocha.taskmanager.exception.general.ResourceNotFoundException;
 import com.github.aliwocha.taskmanager.mapper.TaskMapper;
 import com.github.aliwocha.taskmanager.repository.CategoryRepository;
 import com.github.aliwocha.taskmanager.repository.TaskRepository;
