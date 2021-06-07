@@ -15,11 +15,12 @@ import java.util.Date;
 public class TaskConfig {
 
     private static final Logger LOG = LoggerFactory.getLogger(TaskConfig.class);
-    private static final SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
+    private final SimpleDateFormat dateFormat;
     private final TaskRepository taskRepository;
 
     public TaskConfig(TaskRepository taskRepository) {
         this.taskRepository = taskRepository;
+        dateFormat = new SimpleDateFormat("HH:mm:ss");
     }
 
     @PostConstruct
