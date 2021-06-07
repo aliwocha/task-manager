@@ -1,4 +1,4 @@
-package com.github.aliwocha.taskmanager.service.user;
+package com.github.aliwocha.taskmanager.service;
 
 import com.github.aliwocha.taskmanager.dto.UserDto;
 

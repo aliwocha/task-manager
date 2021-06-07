@@ -3,7 +3,7 @@ package com.github.aliwocha.taskmanager.controller;
 import com.github.aliwocha.taskmanager.dto.TaskDto;
 import com.github.aliwocha.taskmanager.exception.general.IdForbiddenException;
 import com.github.aliwocha.taskmanager.exception.general.IdNotMatchingException;
-import com.github.aliwocha.taskmanager.service.task.TaskServiceImpl;
+import com.github.aliwocha.taskmanager.service.impl.TaskServiceImpl;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;

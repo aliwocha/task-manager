@@ -1,4 +1,4 @@
-package com.github.aliwocha.taskmanager.service.task;
+package com.github.aliwocha.taskmanager.service.impl;
 
 import com.github.aliwocha.taskmanager.dto.TaskDto;
 import com.github.aliwocha.taskmanager.entity.Task;
@@ -7,6 +7,7 @@ import com.github.aliwocha.taskmanager.exception.general.ResourceNotFoundExcepti
 import com.github.aliwocha.taskmanager.mapper.TaskMapper;
 import com.github.aliwocha.taskmanager.repository.CategoryRepository;
 import com.github.aliwocha.taskmanager.repository.TaskRepository;
+import com.github.aliwocha.taskmanager.service.TaskService;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;

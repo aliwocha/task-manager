@@ -1,4 +1,4 @@
-package com.github.aliwocha.taskmanager.service.user;
+package com.github.aliwocha.taskmanager.service.impl;
 
 import com.github.aliwocha.taskmanager.dto.UserDto;
 import com.github.aliwocha.taskmanager.entity.User;
@@ -8,6 +8,7 @@ import com.github.aliwocha.taskmanager.exception.user.InvalidUserException;
 import com.github.aliwocha.taskmanager.mapper.UserMapper;
 import com.github.aliwocha.taskmanager.repository.RoleRepository;
 import com.github.aliwocha.taskmanager.repository.UserRepository;
+import com.github.aliwocha.taskmanager.service.UserService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

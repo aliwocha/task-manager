@@ -1,4 +1,4 @@
-package com.github.aliwocha.taskmanager.service.category;
+package com.github.aliwocha.taskmanager.service.impl;
 
 import com.github.aliwocha.taskmanager.dto.CategoryDto;
 import com.github.aliwocha.taskmanager.dto.TaskDto;
@@ -10,6 +10,7 @@ import com.github.aliwocha.taskmanager.mapper.CategoryMapper;
 import com.github.aliwocha.taskmanager.mapper.TaskMapper;
 import com.github.aliwocha.taskmanager.repository.CategoryRepository;
 import com.github.aliwocha.taskmanager.repository.TaskRepository;
+import com.github.aliwocha.taskmanager.service.CategoryService;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;

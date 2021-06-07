@@ -1,4 +1,4 @@
-package com.github.aliwocha.taskmanager.service.category;
+package com.github.aliwocha.taskmanager.service;
 
 import com.github.aliwocha.taskmanager.dto.CategoryDto;
 import com.github.aliwocha.taskmanager.dto.TaskDto;
