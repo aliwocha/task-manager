@@ -12,13 +12,13 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 @Configuration
-public class TaskConfig {
+public class TaskConfiguration {
 
-    private static final Logger LOG = LoggerFactory.getLogger(TaskConfig.class);
+    private static final Logger LOG = LoggerFactory.getLogger(TaskConfiguration.class);
     private final SimpleDateFormat dateFormat;
     private final TaskRepository taskRepository;
 
-    public TaskConfig(TaskRepository taskRepository) {
+    public TaskConfiguration(TaskRepository taskRepository) {
         this.taskRepository = taskRepository;
         dateFormat = new SimpleDateFormat("HH:mm:ss");
     }
