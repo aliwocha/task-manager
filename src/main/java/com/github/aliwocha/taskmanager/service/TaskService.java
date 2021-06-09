@@ -1,15 +1,16 @@
 package com.github.aliwocha.taskmanager.service;
 
 import com.github.aliwocha.taskmanager.dto.TaskDto;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
-import java.util.List;
 import java.util.Optional;
 
 public interface TaskService {
 
-    List<TaskDto> getAllTasks();
+    Page<TaskDto> getTasksPaginated(Pageable pageable);
 
-    List<TaskDto> getAllTasksByStatus(String status);
+    Page<TaskDto> getTasksByStatusPaginated(String status, Pageable pageable);
 
     Optional<TaskDto> getTask(Long id);
 

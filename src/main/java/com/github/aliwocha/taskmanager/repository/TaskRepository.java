@@ -10,6 +10,4 @@ import java.util.List;
 public interface TaskRepository extends JpaRepository<Task, Long> {
 
     List<Task> findAllByCategory_Id(Long categoryId);
-
-    List<Task> findAllByStatus(Task.Status status);
 }

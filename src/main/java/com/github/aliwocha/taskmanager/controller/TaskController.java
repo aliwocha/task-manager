@@ -4,12 +4,14 @@ import com.github.aliwocha.taskmanager.dto.TaskDto;
 import com.github.aliwocha.taskmanager.exception.general.IdForbiddenException;
 import com.github.aliwocha.taskmanager.exception.general.IdNotMatchingException;
 import com.github.aliwocha.taskmanager.service.impl.TaskServiceImpl;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
-import java.util.List;
 
 @RestController
 @RequestMapping("/tasks")
@@ -22,11 +24,12 @@ public class TaskController {
     }
 
     @GetMapping
-    public ResponseEntity<List<TaskDto>> getAllTasks(@RequestParam(required = false) String status) {
+    public ResponseEntity<Page<TaskDto>> getTasksPaginated(@RequestParam(required = false) String status,
+                                                           @PageableDefault Pageable pageable) {
         if (status != null) {
-            return ResponseEntity.ok(taskService.getAllTasksByStatus(status));
+            return ResponseEntity.ok(taskService.getTasksByStatusPaginated(status, pageable));
         } else {
-            return ResponseEntity.ok(taskService.getAllTasks());
+            return ResponseEntity.ok(taskService.getTasksPaginated(pageable));
         }
     }
 

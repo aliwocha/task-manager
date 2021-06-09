@@ -8,7 +8,7 @@ import java.util.Optional;
 
 public interface CategoryService {
 
-    List<String> getAllNames();
+    List<String> getNames();
 
     Optional<String> getCategoryName(Long id);
 

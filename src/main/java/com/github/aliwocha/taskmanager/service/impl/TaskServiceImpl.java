@@ -8,6 +8,9 @@ import com.github.aliwocha.taskmanager.mapper.TaskMapper;
 import com.github.aliwocha.taskmanager.repository.CategoryRepository;
 import com.github.aliwocha.taskmanager.repository.TaskRepository;
 import com.github.aliwocha.taskmanager.service.TaskService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -30,15 +33,19 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public List<TaskDto> getAllTasks() {
-        return taskRepository.findAll()
+    public Page<TaskDto> getTasksPaginated(Pageable pageable) {
+        Page<Task> tasks = taskRepository.findAll(pageable);
+
+        List<TaskDto> taskDtos = tasks.getContent()
                 .stream()
                 .map(taskMapper::toDto)
                 .collect(Collectors.toList());
+
+        return new PageImpl<>(taskDtos, pageable, tasks.getTotalElements());
     }
 
     @Override
-    public List<TaskDto> getAllTasksByStatus(String status) {
+    public Page<TaskDto> getTasksByStatusPaginated(String status, Pageable pageable) {
         List<String> statusNames = Arrays.stream(Task.Status.values())
                 .map(Enum::name)
                 .collect(Collectors.toList());
@@ -47,10 +54,15 @@ public class TaskServiceImpl implements TaskService {
             throw new InvalidTaskException("Requested status name does not exist");
         }
 
-        return taskRepository.findAllByStatus(Task.Status.valueOf(status.toUpperCase()))
+        Page<Task> tasks = taskRepository.findAll(pageable);
+
+        List<TaskDto> taskDtosByStatus = tasks.getContent()
                 .stream()
+                .filter(t -> t.getStatus().equals(Task.Status.valueOf(status.toUpperCase())))
                 .map(taskMapper::toDto)
                 .collect(Collectors.toList());
+
+        return new PageImpl<>(taskDtosByStatus, pageable, tasks.getTotalElements());
     }
 
     @Override

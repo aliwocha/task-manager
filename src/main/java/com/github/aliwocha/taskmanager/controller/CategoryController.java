@@ -23,8 +23,8 @@ public class CategoryController {
     }
 
     @GetMapping("/names")
-    public ResponseEntity<List<String>> getAllNames() {
-        return ResponseEntity.ok(categoryService.getAllNames());
+    public ResponseEntity<List<String>> getNames() {
+        return ResponseEntity.ok(categoryService.getNames());
     }
 
     @GetMapping("/{id}")
