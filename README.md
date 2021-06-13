@@ -5,19 +5,19 @@ The app is being created for personal use. It allows adding, editing and deletin
 **The applications is _IN PROGRESS_**. 
 
 Functionalities implemented so far:
-* endpoints with CRUD methods for Category and Task entities
+* endpoints with CRUD methods for all entities
 * getting tasks assigned to particular category
 * validation of data
 * scheduling of task status
 * exception handling
 * integration with H2 database
+* API documentation by Swagger
+* pagination
 
 Functionalities to be implemented:
-* pagination
 * authentication provided by Spring Security
 * unit tests
 * integration with MySQL or PostgreSQL
-* API documentation by Swagger
 * frontend of the app
 * deployment to the public server (e.g. Heroku)
 
