@@ -19,7 +19,7 @@ public class User {
     private String login;
 
     @NotBlank(message = "Password is mandatory")
-    @Size(min = 6, message = "Password must have minimum 6 characters")
+    @Size(min = 6, max = 32, message = "Password must have between 6 and 32 characters")
     private String password;
 
     @NotNull(message = "Role cannot be null")
