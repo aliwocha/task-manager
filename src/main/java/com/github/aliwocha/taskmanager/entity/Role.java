@@ -16,9 +16,6 @@ public class Role {
     @Column(unique = true)
     private String name;
 
-    public Role() {
-    }
-
     public Long getId() {
         return id;
     }

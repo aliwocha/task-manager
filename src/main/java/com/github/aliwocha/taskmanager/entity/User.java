@@ -1,6 +1,7 @@
 package com.github.aliwocha.taskmanager.entity;
 
 import javax.persistence.*;
+import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -19,19 +20,33 @@ public class User {
     private String login;
 
     @NotBlank(message = "Password is mandatory")
-    @Size(min = 6, max = 32, message = "Password must have between 6 and 32 characters")
+    @Size(min = 3, max = 100, message = "Password must have between 3 and 100 characters")
     private String password;
+
+    @Email(message = "Wrong email format")
+    @NotBlank(message = "Email is mandatory")
+    @Column(unique = true)
+    private String email;
+
+    @NotNull
+    @Column(name = "enabled")
+    private Boolean isEnabled;
 
     @NotNull(message = "Role cannot be null")
     @ManyToOne
     @JoinColumn(name = "role_id")
     private Role role;
 
-    public User() {
-    }
-
     public Long getId() {
         return id;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public void setId(Long id) {
@@ -54,6 +69,14 @@ public class User {
         this.password = password;
     }
 
+    public Boolean getEnabled() {
+        return isEnabled;
+    }
+
+    public void setEnabled(Boolean enabled) {
+        isEnabled = enabled;
+    }
+
     public Role getRole() {
         return role;
     }
@@ -67,13 +90,14 @@ public class User {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         User user = (User) o;
-        return Objects.equals(id, user.id) && Objects.equals(login, user.login) && Objects.equals(password, user.password)
-                && Objects.equals(role, user.role);
+        return Objects.equals(id, user.id) && Objects.equals(login, user.login)
+                && Objects.equals(password, user.password) && Objects.equals(email, user.email)
+                && Objects.equals(isEnabled, user.isEnabled) && Objects.equals(role, user.role);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, login, password, role);
+        return Objects.hash(id, login, password, email, isEnabled, role);
     }
 
     @Override
@@ -82,6 +106,8 @@ public class User {
                 "id=" + id +
                 ", login=" + login +
                 ", password=" + password +
+                ", email=" + email +
+                ", isEnabled=" + isEnabled +
                 ", role=" + role.getName() +
                 ']';
     }

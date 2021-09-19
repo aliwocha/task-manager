@@ -22,6 +22,7 @@ public class UserMapper {
         dto.setId(user.getId());
         dto.setLogin(user.getLogin());
         dto.setPassword(user.getPassword());
+        dto.setEmail(user.getEmail());
         if (user.getRole() != null) {
             dto.setRole(user.getRole().getName());
         }
@@ -34,6 +35,8 @@ public class UserMapper {
         entity.setId(user.getId());
         entity.setLogin(user.getLogin());
         entity.setPassword(user.getPassword());
+        entity.setEmail(user.getEmail());
+        entity.setEnabled(false);
         Optional<Role> role = roleRepository.findByNameIgnoreCase(user.getRole());
         role.ifPresent(entity::setRole);
 
