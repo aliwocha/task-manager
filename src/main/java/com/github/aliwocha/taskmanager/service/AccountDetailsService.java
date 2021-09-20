@@ -4,7 +4,7 @@ import com.github.aliwocha.taskmanager.entity.User;
 
 public interface AccountDetailsService {
 
-    String registerUser(User user);
+    void registerUser(User user);
 
     void enableUser(User user);
 }

@@ -35,7 +35,7 @@ public class RegistrationServiceImpl implements RegistrationService {
 
     @Override
     public String registerUser(RegistrationRequest request) {
-        // uzyc mappera RegistrationMapper
+        // TODO: RegistrationMapper
         User user = new User();
         user.setLogin(request.getLogin());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
@@ -44,7 +44,9 @@ public class RegistrationServiceImpl implements RegistrationService {
         Optional<Role> role = roleRepository.findByNameIgnoreCase("ROLE_USER");
         role.ifPresent(user::setRole);
 
-        return accountDetailsService.registerUser(user);
+        accountDetailsService.registerUser(user);
+
+        return "Success!";
     }
 
     @Transactional
