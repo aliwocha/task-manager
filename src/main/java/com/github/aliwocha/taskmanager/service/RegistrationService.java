@@ -4,5 +4,7 @@ import com.github.aliwocha.taskmanager.request.RegistrationRequest;
 
 public interface RegistrationService {
 
-    String register(RegistrationRequest request);
+    String registerUser(RegistrationRequest request);
+
+    String confirmEmail(String token);
 }
