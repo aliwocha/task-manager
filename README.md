@@ -1,6 +1,6 @@
 # **Task Manager**
 
-The app is being created for personal use. It allows adding, editing and deleting tasks, changing statuses and priorities, loading and saving data in the database, as well as authentication of users. I am currently developing the backend part. Frontend will be written in either AngularJS or React. Both layers will be communicating using REST API.
+The app allows adding, editing and deleting tasks, changing statuses and priorities, loading and saving data in the database, as well as authentication and registration of users. I am currently developing the backend part. Frontend will be written in the future. Both layers will be communicating using REST API.
 
 **The applications is _IN PROGRESS_**. 
 
@@ -13,18 +13,20 @@ Functionalities implemented so far:
 * integration with H2 database
 * API documentation by Swagger
 * pagination
+* authentication and authorization by Spring Security
+* sending emails with confirmation links
 
 Functionalities to be implemented:
-* authentication provided by Spring Security
-* unit tests
+* one-to-many relation between users and tasks (each user can see his own tasks list)
 * integration with MySQL or PostgreSQL
-* frontend of the app
 * deployment to the public server (e.g. Heroku)
+* unit tests
 
 ## **Technology used so far:**
 * Java 11
 * SpringBoot
-* Spring Data JPA
+* Spring Security  
+* Spring Data
 * Hibernate
 * H2
 
@@ -42,9 +44,9 @@ Functionalities to be implemented:
 mvnw.cmd spring-boot:run
 ```
 
-3. Go to the following page in your browser to test the app: [http://localhost:8080/](http://localhost:8080/)
+3. Go to the following page in your browser to test the app: [http://localhost:8080/api](http://localhost:8080/api)
 
-4. Go to the following page in your browser to see database tables: [http://localhost:8080/h2-console](http://localhost:8080/h2-console)
+4. Go to the following page in your browser to see database tables: [http://localhost:8080/api/h2-console](http://localhost:8080/api/h2-console)
 
 5. Use default values to log in to H2 database:
 

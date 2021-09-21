@@ -46,6 +46,9 @@ public class AccountDetailsServiceImpl implements AccountDetailsService, UserDet
 
         Optional<User> userByEmail = userRepository.findByEmailIgnoreCase(user.getEmail());
         if (userByEmail.isPresent()) {
+            // TODO: check if user is the same (who's trying to register) and
+            // TODO: if email not confirmed (token expired), send email again
+
             throw new DuplicateEmailException();
         }
 
