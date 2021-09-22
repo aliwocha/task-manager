@@ -13,21 +13,22 @@ import java.util.UUID;
 @Service
 public class ConfirmationTokenServiceImpl implements ConfirmationTokenService {
 
-    private final ConfirmationTokenRepository tokenRepository;
+    private final ConfirmationTokenRepository confirmationTokenRepository;
 
-    public ConfirmationTokenServiceImpl(ConfirmationTokenRepository tokenRepository) {
-        this.tokenRepository = tokenRepository;
+    public ConfirmationTokenServiceImpl(ConfirmationTokenRepository confirmationTokenRepository) {
+        this.confirmationTokenRepository = confirmationTokenRepository;
     }
 
     @Override
     public void saveToken(ConfirmationToken token) {
-        tokenRepository.save(token);
+        confirmationTokenRepository.save(token);
     }
 
     @Override
     public ConfirmationToken getToken(String token) {
-        return tokenRepository.findByTokenIgnoreCase(token).orElseThrow(TokenNotFoundException::new);
+        return confirmationTokenRepository.findByTokenIgnoreCase(token).orElseThrow(TokenNotFoundException::new);
     }
+
 
     @Override
     public ConfirmationToken createToken(User user) {
@@ -38,9 +39,16 @@ public class ConfirmationTokenServiceImpl implements ConfirmationTokenService {
         confirmationToken.setToken(token);
         LocalDateTime now = LocalDateTime.now();
         confirmationToken.setCreatedAt(now);
-        confirmationToken.setExpiresAt(now.plusMinutes(15));
+        confirmationToken.setExpiresAt(now.plusMinutes(2));
         confirmationToken.setUser(user);
 
         return confirmationToken;
+    }
+
+    @Override
+    public boolean checkIfAllTokensExpired(User user) {
+        return confirmationTokenRepository.findAllByUser(user)
+                .stream()
+                .allMatch(t -> t.getExpiresAt().isBefore(LocalDateTime.now()));
     }
 }

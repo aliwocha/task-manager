@@ -10,4 +10,6 @@ public interface ConfirmationTokenService {
     ConfirmationToken getToken(String token);
 
     ConfirmationToken createToken(User user);
+
+    boolean checkIfAllTokensExpired(User user);
 }

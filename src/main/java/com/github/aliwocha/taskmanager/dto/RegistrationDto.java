@@ -1,10 +1,19 @@
-package com.github.aliwocha.taskmanager.request;
+package com.github.aliwocha.taskmanager.dto;
 
-public class RegistrationRequest {
+public class RegistrationDto {
 
+    private Long id;
     private String login;
     private String password;
     private String email;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public String getLogin() {
         return login;

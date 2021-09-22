@@ -1,16 +1,15 @@
 package com.github.aliwocha.taskmanager.controller;
 
-import com.github.aliwocha.taskmanager.request.RegistrationRequest;
+import com.github.aliwocha.taskmanager.dto.RegistrationDto;
 import com.github.aliwocha.taskmanager.service.RegistrationService;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
-@Controller
+@RestController
 @RequestMapping("/register")
 public class RegistrationController {
 
@@ -20,20 +19,17 @@ public class RegistrationController {
         this.registrationService = registrationService;
     }
 
-    @GetMapping
-    public String signUp(Model model) {
-        model.addAttribute("request", new RegistrationRequest());
-        return "register";
+    @PostMapping
+    public String registerUser(@RequestBody RegistrationDto registrationDto) {
+        return registrationService.registerUser(registrationDto);
     }
 
-    @PostMapping
-    @ResponseBody
-    public String registerUser(RegistrationRequest request) {
-        return registrationService.registerUser(request);
+    @PostMapping("/resend-email")
+    public String resendEmail(@RequestBody RegistrationDto registrationDto) {
+        return registrationService.resendConfirmationEmail(registrationDto);
     }
 
     @GetMapping("/confirm")
-    @ResponseBody
     public String confirmEmail(@RequestParam String token) {
         return registrationService.confirmEmail(token);
     }

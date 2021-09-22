@@ -4,7 +4,11 @@ import com.github.aliwocha.taskmanager.entity.AccountDetailsAdapter;
 import com.github.aliwocha.taskmanager.entity.ConfirmationToken;
 import com.github.aliwocha.taskmanager.entity.User;
 import com.github.aliwocha.taskmanager.exception.email.DuplicateEmailException;
+import com.github.aliwocha.taskmanager.exception.email.EmailAlreadyConfirmedException;
+import com.github.aliwocha.taskmanager.exception.email.InvalidEmailException;
+import com.github.aliwocha.taskmanager.exception.token.TokenNotExpiredException;
 import com.github.aliwocha.taskmanager.exception.user.DuplicateUserException;
+import com.github.aliwocha.taskmanager.exception.user.UserLoginNotFoundException;
 import com.github.aliwocha.taskmanager.repository.UserRepository;
 import com.github.aliwocha.taskmanager.service.AccountDetailsService;
 import com.github.aliwocha.taskmanager.service.ConfirmationTokenService;
@@ -24,7 +28,8 @@ public class AccountDetailsServiceImpl implements AccountDetailsService, UserDet
     private final ConfirmationTokenService confirmationTokenService;
     private final EmailService emailService;
 
-    public AccountDetailsServiceImpl(UserRepository userRepository, ConfirmationTokenService confirmationTokenService, EmailService emailService) {
+    public AccountDetailsServiceImpl(UserRepository userRepository, ConfirmationTokenService confirmationTokenService,
+                                     EmailService emailService) {
         this.userRepository = userRepository;
         this.confirmationTokenService = confirmationTokenService;
         this.emailService = emailService;
@@ -38,7 +43,7 @@ public class AccountDetailsServiceImpl implements AccountDetailsService, UserDet
 
     @Transactional
     @Override
-    public void registerUser(User user) {
+    public String registerUser(User user) {
         Optional<User> userByLogin = userRepository.findByLoginIgnoreCase(user.getLogin());
         if (userByLogin.isPresent()) {
             throw new DuplicateUserException();
@@ -46,14 +51,11 @@ public class AccountDetailsServiceImpl implements AccountDetailsService, UserDet
 
         Optional<User> userByEmail = userRepository.findByEmailIgnoreCase(user.getEmail());
         if (userByEmail.isPresent()) {
-            // TODO: check if user is the same (who's trying to register) and
-            // TODO: if email not confirmed (token expired), send email again
-
             throw new DuplicateEmailException();
         }
 
         userRepository.save(user);
-        sendToken(user);
+        return sendConfirmationEmail(user);
     }
 
     @Override
@@ -61,13 +63,36 @@ public class AccountDetailsServiceImpl implements AccountDetailsService, UserDet
         userRepository.findByEmailIgnoreCase(user.getEmail()).ifPresent(u -> u.setEnabled(true));
     }
 
-    private void sendToken(User user) {
+    @Override
+    public String resendConfirmationEmail(String login, String email) {
+        Optional<User> userByLogin = userRepository.findByLoginIgnoreCase(login);
+        if (userByLogin.isEmpty()) {
+            throw new UserLoginNotFoundException();
+        }
+
+        User user = userByLogin.get();
+        if (!email.equals(user.getEmail())) {
+            throw new InvalidEmailException("Invalid email for given login");
+        } else if (user.isEnabled()) {
+            throw new EmailAlreadyConfirmedException();
+        } else if (!confirmationTokenService.checkIfAllTokensExpired(user)) {
+            throw new TokenNotExpiredException();
+        } else {
+            return sendConfirmationEmail(user);
+        }
+    }
+
+    private String sendConfirmationEmail(User user) {
         ConfirmationToken confirmationToken = confirmationTokenService.createToken(user);
         confirmationTokenService.saveToken(confirmationToken);
 
-        String url = "http://localhost:8080/api/register/confirm?token=" + confirmationToken.getToken();
+        String tokenValue = confirmationToken.getToken();
+
+        String url = "http://localhost:8080/api/register/confirm?token=" + tokenValue;
 
         emailService.sendEmail(user.getEmail(), "Confirm your email",
-                "Confirm registration by clicking in the link " + url, false);
+                "Confirm registration by clicking in the link: " + url, false);
+
+        return tokenValue;
     }
 }

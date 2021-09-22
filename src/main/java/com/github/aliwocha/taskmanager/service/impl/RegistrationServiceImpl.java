@@ -1,52 +1,37 @@
 package com.github.aliwocha.taskmanager.service.impl;
 
+import com.github.aliwocha.taskmanager.dto.RegistrationDto;
 import com.github.aliwocha.taskmanager.entity.ConfirmationToken;
-import com.github.aliwocha.taskmanager.entity.Role;
 import com.github.aliwocha.taskmanager.entity.User;
 import com.github.aliwocha.taskmanager.exception.email.EmailAlreadyConfirmedException;
 import com.github.aliwocha.taskmanager.exception.token.TokenExpiredException;
-import com.github.aliwocha.taskmanager.repository.RoleRepository;
-import com.github.aliwocha.taskmanager.request.RegistrationRequest;
+import com.github.aliwocha.taskmanager.mapper.RegistrationMapper;
 import com.github.aliwocha.taskmanager.service.AccountDetailsService;
 import com.github.aliwocha.taskmanager.service.ConfirmationTokenService;
 import com.github.aliwocha.taskmanager.service.RegistrationService;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
-import java.util.Optional;
 
 @Service
 public class RegistrationServiceImpl implements RegistrationService {
 
     private final AccountDetailsService accountDetailsService;
-    private final RoleRepository roleRepository;
-    private final PasswordEncoder passwordEncoder;
     private final ConfirmationTokenService confirmationTokenService;
+    private final RegistrationMapper registrationMapper;
 
-    public RegistrationServiceImpl(AccountDetailsService accountDetailsService, RoleRepository roleRepository,
-                                   PasswordEncoder passwordEncoder, ConfirmationTokenService confirmationTokenService) {
+    public RegistrationServiceImpl(AccountDetailsService accountDetailsService, ConfirmationTokenService confirmationTokenService,
+                                   RegistrationMapper registrationMapper) {
         this.accountDetailsService = accountDetailsService;
-        this.roleRepository = roleRepository;
-        this.passwordEncoder = passwordEncoder;
         this.confirmationTokenService = confirmationTokenService;
+        this.registrationMapper = registrationMapper;
     }
 
     @Override
-    public String registerUser(RegistrationRequest request) {
-        // TODO: RegistrationMapper
-        User user = new User();
-        user.setLogin(request.getLogin());
-        user.setPassword(passwordEncoder.encode(request.getPassword()));
-        user.setEmail(request.getEmail());
-        user.setEnabled(false);
-        Optional<Role> role = roleRepository.findByNameIgnoreCase("ROLE_USER");
-        role.ifPresent(user::setRole);
-
-        accountDetailsService.registerUser(user);
-
-        return "Success!";
+    public String registerUser(RegistrationDto registrationDto) {
+        User user = registrationMapper.toEntity(registrationDto);
+        return accountDetailsService.registerUser(user);
     }
 
     @Transactional
@@ -70,5 +55,10 @@ public class RegistrationServiceImpl implements RegistrationService {
         accountDetailsService.enableUser(confirmationToken.getUser());
 
         return String.format("Email '%s' confirmed", confirmationToken.getUser().getEmail());
+    }
+
+    @Override
+    public String resendConfirmationEmail(RegistrationDto registrationDto) {
+        return accountDetailsService.resendConfirmationEmail(registrationDto.getLogin(), registrationDto.getEmail());
     }
 }
