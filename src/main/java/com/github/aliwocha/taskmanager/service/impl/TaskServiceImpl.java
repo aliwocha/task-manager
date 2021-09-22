@@ -2,8 +2,9 @@ package com.github.aliwocha.taskmanager.service.impl;
 
 import com.github.aliwocha.taskmanager.dto.TaskDto;
 import com.github.aliwocha.taskmanager.entity.Task;
+import com.github.aliwocha.taskmanager.exception.category.CategoryNotFoundException;
 import com.github.aliwocha.taskmanager.exception.task.InvalidTaskException;
-import com.github.aliwocha.taskmanager.exception.general.ResourceNotFoundException;
+import com.github.aliwocha.taskmanager.exception.task.TaskNotFoundException;
 import com.github.aliwocha.taskmanager.mapper.TaskMapper;
 import com.github.aliwocha.taskmanager.repository.CategoryRepository;
 import com.github.aliwocha.taskmanager.repository.TaskRepository;
@@ -51,7 +52,7 @@ public class TaskServiceImpl implements TaskService {
                 .collect(Collectors.toList());
 
         if (!statusNames.contains(status.toUpperCase())) {
-            throw new InvalidTaskException("Requested status name does not exist");
+            throw new InvalidTaskException("Invalid status name");
         }
 
         Page<Task> tasks = taskRepository.findAll(pageable);
@@ -73,7 +74,7 @@ public class TaskServiceImpl implements TaskService {
     @Override
     public TaskDto addTask(TaskDto task) {
         categoryRepository.findByNameIgnoreCase(task.getCategory())
-                .orElseThrow(() -> new InvalidTaskException("Category with given name does not exist"));
+                .orElseThrow(CategoryNotFoundException::new);
 
         if (task.getDeadline() != null && task.getDeadline().isBefore(LocalDate.now())) {
             throw new InvalidTaskException("Date must be present or in the future");
@@ -86,7 +87,7 @@ public class TaskServiceImpl implements TaskService {
     @Override
     public TaskDto updateTask(TaskDto task) {
         categoryRepository.findByNameIgnoreCase(task.getCategory())
-                .orElseThrow(() -> new InvalidTaskException("Category with given name does not exist"));
+                .orElseThrow(CategoryNotFoundException::new);
 
         if (task.getDeadline() != null && task.getDeadline().isBefore(LocalDate.now())) {
             throw new InvalidTaskException("Date must be present or in the future");
@@ -108,7 +109,7 @@ public class TaskServiceImpl implements TaskService {
     @Override
     public void deleteTask(Long id) {
         if (!taskRepository.existsById(id)) {
-            throw new ResourceNotFoundException();
+            throw new TaskNotFoundException();
         }
 
         taskRepository.deleteById(id);

@@ -4,8 +4,8 @@ import com.github.aliwocha.taskmanager.dto.CategoryDto;
 import com.github.aliwocha.taskmanager.dto.TaskDto;
 import com.github.aliwocha.taskmanager.entity.Category;
 import com.github.aliwocha.taskmanager.exception.category.CategoryForbiddenException;
+import com.github.aliwocha.taskmanager.exception.category.CategoryNotFoundException;
 import com.github.aliwocha.taskmanager.exception.category.DuplicateCategoryException;
-import com.github.aliwocha.taskmanager.exception.general.ResourceNotFoundException;
 import com.github.aliwocha.taskmanager.mapper.CategoryMapper;
 import com.github.aliwocha.taskmanager.mapper.TaskMapper;
 import com.github.aliwocha.taskmanager.repository.CategoryRepository;
@@ -51,7 +51,7 @@ public class CategoryServiceImpl implements CategoryService {
     public List<TaskDto> getCategoryTasks(Long categoryId) {
         return categoryRepository.findById(categoryId)
                 .map(Category::getTasks)
-                .orElseThrow(ResourceNotFoundException::new)
+                .orElseThrow(CategoryNotFoundException::new)
                 .stream()
                 .map(taskMapper::toDto)
                 .collect(Collectors.toList());
@@ -94,7 +94,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public void deleteCategory(Long id) {
-        Category category = categoryRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
+        Category category = categoryRepository.findById(id).orElseThrow(CategoryNotFoundException::new);
 
         if (category.getName().equals(DEFAULT_CATEGORY_NAME)) {
             throw new CategoryForbiddenException("This category cannot be deleted");

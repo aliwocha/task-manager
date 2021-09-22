@@ -8,7 +8,7 @@ import com.github.aliwocha.taskmanager.exception.email.EmailAlreadyConfirmedExce
 import com.github.aliwocha.taskmanager.exception.email.InvalidEmailException;
 import com.github.aliwocha.taskmanager.exception.token.TokenNotExpiredException;
 import com.github.aliwocha.taskmanager.exception.user.DuplicateUserException;
-import com.github.aliwocha.taskmanager.exception.user.UserLoginNotFoundException;
+import com.github.aliwocha.taskmanager.exception.user.UserNotFoundException;
 import com.github.aliwocha.taskmanager.repository.UserRepository;
 import com.github.aliwocha.taskmanager.service.AccountDetailsService;
 import com.github.aliwocha.taskmanager.service.ConfirmationTokenService;
@@ -38,7 +38,7 @@ public class AccountDetailsServiceImpl implements AccountDetailsService, UserDet
     @Override
     public UserDetails loadUserByUsername(String login) throws UsernameNotFoundException {
         return new AccountDetailsAdapter(userRepository.findByLoginIgnoreCase(login)
-                .orElseThrow(() -> new UsernameNotFoundException("User with given login does not exist")));
+                .orElseThrow(() -> new UsernameNotFoundException("User with given login not found")));
     }
 
     @Transactional
@@ -67,7 +67,7 @@ public class AccountDetailsServiceImpl implements AccountDetailsService, UserDet
     public String resendConfirmationEmail(String login, String email) {
         Optional<User> userByLogin = userRepository.findByLoginIgnoreCase(login);
         if (userByLogin.isEmpty()) {
-            throw new UserLoginNotFoundException();
+            throw new UserNotFoundException();
         }
 
         User user = userByLogin.get();

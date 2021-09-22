@@ -2,9 +2,9 @@ package com.github.aliwocha.taskmanager.service.impl;
 
 import com.github.aliwocha.taskmanager.dto.UserDto;
 import com.github.aliwocha.taskmanager.entity.User;
+import com.github.aliwocha.taskmanager.exception.role.RoleNotFoundException;
 import com.github.aliwocha.taskmanager.exception.user.DuplicateUserException;
-import com.github.aliwocha.taskmanager.exception.general.ResourceNotFoundException;
-import com.github.aliwocha.taskmanager.exception.user.InvalidUserException;
+import com.github.aliwocha.taskmanager.exception.user.UserNotFoundException;
 import com.github.aliwocha.taskmanager.mapper.UserMapper;
 import com.github.aliwocha.taskmanager.repository.RoleRepository;
 import com.github.aliwocha.taskmanager.repository.UserRepository;
@@ -49,7 +49,7 @@ public class UserServiceImpl implements UserService {
         }
 
         roleRepository.findByNameIgnoreCase(user.getRole())
-                .orElseThrow(() -> new InvalidUserException("Role with given name does not exist"));
+                .orElseThrow(RoleNotFoundException::new);
 
         return mapAndSaveUser(user);
     }
@@ -64,7 +64,7 @@ public class UserServiceImpl implements UserService {
         });
 
         roleRepository.findByNameIgnoreCase(user.getRole())
-                .orElseThrow(() -> new InvalidUserException("Role with given name does not exist"));
+                .orElseThrow(RoleNotFoundException::new);
 
         return mapAndSaveUser(user);
     }
@@ -78,7 +78,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public void deleteUser(Long id) {
         if (!userRepository.existsById(id)) {
-            throw new ResourceNotFoundException();
+            throw new UserNotFoundException();
         }
 
         userRepository.deleteById(id);

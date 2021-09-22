@@ -39,7 +39,7 @@ public class ConfirmationTokenServiceImpl implements ConfirmationTokenService {
         confirmationToken.setToken(token);
         LocalDateTime now = LocalDateTime.now();
         confirmationToken.setCreatedAt(now);
-        confirmationToken.setExpiresAt(now.plusMinutes(2));
+        confirmationToken.setExpiresAt(now.plusMinutes(15));
         confirmationToken.setUser(user);
 
         return confirmationToken;
