@@ -1,11 +1,12 @@
-package com.github.aliwocha.taskmanager.dto;
+package com.github.aliwocha.taskmanager.dto.response;
 
-public class RegistrationDto {
+public class UserResponse {
 
     private Long id;
     private String login;
     private String password;
     private String email;
+    private String role;
 
     public Long getId() {
         return id;
@@ -37,5 +38,13 @@ public class RegistrationDto {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
     }
 }

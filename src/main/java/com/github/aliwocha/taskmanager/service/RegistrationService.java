@@ -1,12 +1,12 @@
 package com.github.aliwocha.taskmanager.service;
 
-import com.github.aliwocha.taskmanager.dto.RegistrationDto;
+import com.github.aliwocha.taskmanager.dto.request.RegistrationRequest;
 
 public interface RegistrationService {
 
-    String registerUser(RegistrationDto registrationDto);
+    String registerUser(RegistrationRequest registrationRequest);
 
     String confirmEmail(String token);
 
-    String resendConfirmationEmail(RegistrationDto registrationDto);
+    String resendConfirmationEmail(RegistrationRequest registrationRequest);
 }

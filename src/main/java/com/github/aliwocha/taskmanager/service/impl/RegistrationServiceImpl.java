@@ -1,11 +1,11 @@
 package com.github.aliwocha.taskmanager.service.impl;
 
-import com.github.aliwocha.taskmanager.dto.RegistrationDto;
+import com.github.aliwocha.taskmanager.dto.mapper.RegistrationMapper;
+import com.github.aliwocha.taskmanager.dto.request.RegistrationRequest;
 import com.github.aliwocha.taskmanager.entity.ConfirmationToken;
 import com.github.aliwocha.taskmanager.entity.User;
 import com.github.aliwocha.taskmanager.exception.email.EmailAlreadyConfirmedException;
 import com.github.aliwocha.taskmanager.exception.token.TokenExpiredException;
-import com.github.aliwocha.taskmanager.mapper.RegistrationMapper;
 import com.github.aliwocha.taskmanager.service.AccountDetailsService;
 import com.github.aliwocha.taskmanager.service.ConfirmationTokenService;
 import com.github.aliwocha.taskmanager.service.RegistrationService;
@@ -29,8 +29,8 @@ public class RegistrationServiceImpl implements RegistrationService {
     }
 
     @Override
-    public String registerUser(RegistrationDto registrationDto) {
-        User user = registrationMapper.toEntity(registrationDto);
+    public String registerUser(RegistrationRequest registrationRequest) {
+        User user = registrationMapper.toEntity(registrationRequest);
         return accountDetailsService.registerUser(user);
     }
 
@@ -58,7 +58,7 @@ public class RegistrationServiceImpl implements RegistrationService {
     }
 
     @Override
-    public String resendConfirmationEmail(RegistrationDto registrationDto) {
-        return accountDetailsService.resendConfirmationEmail(registrationDto.getLogin(), registrationDto.getEmail());
+    public String resendConfirmationEmail(RegistrationRequest registrationRequest) {
+        return accountDetailsService.resendConfirmationEmail(registrationRequest.getLogin(), registrationRequest.getEmail());
     }
 }

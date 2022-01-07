@@ -1,10 +1,13 @@
 package com.github.aliwocha.taskmanager.entity;
 
-import javax.persistence.*;
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 import java.util.Objects;
 
 @Entity
@@ -15,24 +18,18 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank(message = "Login is mandatory")
-    @Column(unique = true)
+    @Column(name = "login", length = 100, nullable = false, unique = true)
     private String login;
 
-    @NotBlank(message = "Password is mandatory")
-    @Size(min = 3, max = 100, message = "Password must have between 3 and 100 characters")
+    @Column(name = "password", length = 100, nullable = false)
     private String password;
 
-    @Email(message = "Wrong email format")
-    @NotBlank(message = "Email is mandatory")
-    @Column(unique = true)
+    @Column(name = "email", length = 100, nullable = false, unique = true)
     private String email;
 
-    @NotNull
-    @Column(name = "enabled")
+    @Column(name = "enabled", nullable = false)
     private Boolean isEnabled;
 
-    @NotNull(message = "Role cannot be null")
     @ManyToOne
     @JoinColumn(name = "role_id")
     private Role role;

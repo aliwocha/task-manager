@@ -1,19 +1,20 @@
 package com.github.aliwocha.taskmanager.service;
 
-import com.github.aliwocha.taskmanager.dto.UserDto;
+import com.github.aliwocha.taskmanager.dto.request.UserRequest;
+import com.github.aliwocha.taskmanager.dto.response.UserResponse;
 
 import java.util.List;
 import java.util.Optional;
 
 public interface UserService {
 
-    List<UserDto> getUsers();
+    List<UserResponse> getUsers();
 
-    Optional<UserDto> getUser(Long id);
+    Optional<UserResponse> getUser(Long id);
 
-    UserDto addUser(UserDto user);
+    UserResponse addUser(UserRequest userRequest);
 
-    UserDto updateUser(UserDto user);
+    UserResponse updateUser(UserRequest userRequest);
 
     void deleteUser(Long id);
 }

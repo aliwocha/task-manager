@@ -1,7 +1,12 @@
 package com.github.aliwocha.taskmanager.entity;
 
-import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -14,8 +19,7 @@ public class Category {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank(message = "Category name is mandatory")
-    @Column(unique = true)
+    @Column(name = "category_name", length = 50, nullable = false, unique = true)
     private String name;
 
     @OneToMany(mappedBy = "category")

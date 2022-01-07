@@ -1,7 +1,8 @@
 package com.github.aliwocha.taskmanager.service;
 
-import com.github.aliwocha.taskmanager.dto.CategoryDto;
-import com.github.aliwocha.taskmanager.dto.TaskDto;
+import com.github.aliwocha.taskmanager.dto.request.CategoryRequest;
+import com.github.aliwocha.taskmanager.dto.response.CategoryResponse;
+import com.github.aliwocha.taskmanager.dto.response.TaskResponse;
 
 import java.util.List;
 import java.util.Optional;
@@ -12,11 +13,11 @@ public interface CategoryService {
 
     Optional<String> getCategoryName(Long id);
 
-    List<TaskDto> getCategoryTasks(Long categoryId);
+    List<TaskResponse> getCategoryTasks(Long categoryId);
 
-    CategoryDto addCategory(CategoryDto category);
+    CategoryResponse addCategory(CategoryRequest categoryRequest);
 
-    CategoryDto updateCategory(CategoryDto category);
+    CategoryResponse updateCategory(CategoryRequest categoryRequest);
 
     void deleteCategory(Long id);
 }

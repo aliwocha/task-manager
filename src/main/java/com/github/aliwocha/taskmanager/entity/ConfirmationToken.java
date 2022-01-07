@@ -1,13 +1,12 @@
 package com.github.aliwocha.taskmanager.entity;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
@@ -18,18 +17,18 @@ public class ConfirmationToken {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank(message = "Token is mandatory")
+    @Column(name = "token", nullable = false, unique = true)
     private String token;
 
-    @NotNull(message = "CreatedAt cannot be null")
+    @Column(name = "created_at", length = 50, nullable = false)
     private LocalDateTime createdAt;
 
-    @NotNull(message = "ExpiresAt cannot be null")
+    @Column(name = "expires_at", length = 50, nullable = false)
     private LocalDateTime expiresAt;
 
+    @Column(name = "confirmed_at", length = 50)
     private LocalDateTime confirmedAt;
 
-    @NotNull(message = "User cannot be null")
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;

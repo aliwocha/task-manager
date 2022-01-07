@@ -1,11 +1,12 @@
 package com.github.aliwocha.taskmanager.service.impl;
 
-import com.github.aliwocha.taskmanager.dto.UserDto;
+import com.github.aliwocha.taskmanager.dto.mapper.UserMapper;
+import com.github.aliwocha.taskmanager.dto.request.UserRequest;
+import com.github.aliwocha.taskmanager.dto.response.UserResponse;
 import com.github.aliwocha.taskmanager.entity.User;
 import com.github.aliwocha.taskmanager.exception.role.RoleNotFoundException;
 import com.github.aliwocha.taskmanager.exception.user.DuplicateUserException;
 import com.github.aliwocha.taskmanager.exception.user.UserNotFoundException;
-import com.github.aliwocha.taskmanager.mapper.UserMapper;
 import com.github.aliwocha.taskmanager.repository.RoleRepository;
 import com.github.aliwocha.taskmanager.repository.UserRepository;
 import com.github.aliwocha.taskmanager.service.UserService;
@@ -29,7 +30,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<UserDto> getUsers() {
+    public List<UserResponse> getUsers() {
         return userRepository.findAll()
                 .stream()
                 .map(userMapper::toDto)
@@ -37,41 +38,41 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Optional<UserDto> getUser(Long id) {
+    public Optional<UserResponse> getUser(Long id) {
         return userRepository.findById(id).map(userMapper::toDto);
     }
 
     @Override
-    public UserDto addUser(UserDto user) {
-        Optional<User> userByLogin = userRepository.findByLoginIgnoreCase(user.getLogin());
+    public UserResponse addUser(UserRequest userRequest) {
+        Optional<User> userByLogin = userRepository.findByLoginIgnoreCase(userRequest.getLogin());
         if (userByLogin.isPresent()) {
             throw new DuplicateUserException();
         }
 
-        roleRepository.findByNameIgnoreCase(user.getRole())
+        roleRepository.findByNameIgnoreCase(userRequest.getRole())
                 .orElseThrow(RoleNotFoundException::new);
 
-        return mapAndSaveUser(user);
+        return mapAndSaveUser(userRequest);
     }
 
     @Override
-    public UserDto updateUser(UserDto user) {
-        Optional<User> userByLogin = userRepository.findByLoginIgnoreCase(user.getLogin());
+    public UserResponse updateUser(UserRequest userRequest) {
+        Optional<User> userByLogin = userRepository.findByLoginIgnoreCase(userRequest.getLogin());
         userByLogin.ifPresent(u -> {
-            if (!u.getId().equals(user.getId())) {
+            if (!u.getId().equals(userRequest.getId())) {
                 throw new DuplicateUserException();
             }
         });
 
-        roleRepository.findByNameIgnoreCase(user.getRole())
+        roleRepository.findByNameIgnoreCase(userRequest.getRole())
                 .orElseThrow(RoleNotFoundException::new);
 
-        return mapAndSaveUser(user);
+        return mapAndSaveUser(userRequest);
     }
 
-    private UserDto mapAndSaveUser(UserDto user) {
-        User userEntity = userMapper.toEntity(user);
-        User savedUser = userRepository.save(userEntity);
+    private UserResponse mapAndSaveUser(UserRequest userRequest) {
+        User user = userMapper.toEntity(userRequest);
+        User savedUser = userRepository.save(user);
         return userMapper.toDto(savedUser);
     }
 

@@ -1,8 +1,15 @@
 package com.github.aliwocha.taskmanager.entity;
 
-import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 import java.time.LocalDate;
 import java.util.Objects;
 
@@ -14,26 +21,25 @@ public class Task {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank(message = "Title is mandatory")
+    @Column(name = "title", length = 250, nullable = false)
     private String title;
 
-    @NotNull(message = "Description cannot be null")
-    @Column(length = 1024)
+    @Column(name = "description", length = 1000)
     private String description;
 
-    @NotNull(message = "Category cannot be null")
     @ManyToOne
     @JoinColumn(name = "category_id")
     private Category category;
 
-    @NotNull(message = "Priority cannot be null")
+    @Column(name = "priority", length = 50, nullable = false)
     @Enumerated(EnumType.STRING)
     private Priority priority;
 
-    @NotNull(message = "Status cannot be null")
+    @Column(name = "status", length = 50, nullable = false)
     @Enumerated(EnumType.STRING)
     private Status status;
 
+    @Column(name = "deadline", length = 50)
     private LocalDate deadline;
 
     public Long getId() {

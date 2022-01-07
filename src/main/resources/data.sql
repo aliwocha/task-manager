@@ -1,14 +1,14 @@
-INSERT into roles(id, name) VALUES
+INSERT into roles(id, role_name) VALUES
     (1, 'ROLE_USER'),
     (2, 'ROLE_ADMIN');
 
 --user - pass: user
 --admin - pass: admin
 INSERT into users(id, login, password, email, enabled, role_id) VALUES
-    (1, 'user', '$2a$12$H9Nubp16Jemw4y52ilMqr.RTVcwQc/pm9pR8uqf.ioqS8eTRhiFGq', 'mail@gmail.com', true, 1),
-    (2, 'admin', '$2a$12$9FmjWD0L1vIhb4f1O7m33.WrE3MH7JZRO8iOFfbSI7VyfZg6ohQaq', 'mail.net@gmail.com', true, 2);
+    (1, 'user', '$2a$10$Pef2YReykJBsFlPMiQDN/Osuw.giwWfpmOWDfJV0MRV6QK.SMr7uu', 'mail@gmail.com', true, 1),
+    (2, 'admin', '$2a$10$kb6QF30IUX.S2GmzoWLUFOCnf/UBzP1nJ73P2/g8nsC6FY6o9Jd/2', 'mail.net@gmail.com', true, 2);
 
-INSERT into categories(id, name) VALUES
+INSERT into categories(id, category_name) VALUES
     (1, 'No category'),
     (2, 'Personal'),
     (3, 'Home'),

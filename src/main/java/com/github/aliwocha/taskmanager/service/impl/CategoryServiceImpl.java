@@ -1,13 +1,14 @@
 package com.github.aliwocha.taskmanager.service.impl;
 
-import com.github.aliwocha.taskmanager.dto.CategoryDto;
-import com.github.aliwocha.taskmanager.dto.TaskDto;
+import com.github.aliwocha.taskmanager.dto.mapper.CategoryMapper;
+import com.github.aliwocha.taskmanager.dto.mapper.TaskMapper;
+import com.github.aliwocha.taskmanager.dto.request.CategoryRequest;
+import com.github.aliwocha.taskmanager.dto.response.CategoryResponse;
+import com.github.aliwocha.taskmanager.dto.response.TaskResponse;
 import com.github.aliwocha.taskmanager.entity.Category;
 import com.github.aliwocha.taskmanager.exception.category.CategoryForbiddenException;
 import com.github.aliwocha.taskmanager.exception.category.CategoryNotFoundException;
 import com.github.aliwocha.taskmanager.exception.category.DuplicateCategoryException;
-import com.github.aliwocha.taskmanager.mapper.CategoryMapper;
-import com.github.aliwocha.taskmanager.mapper.TaskMapper;
 import com.github.aliwocha.taskmanager.repository.CategoryRepository;
 import com.github.aliwocha.taskmanager.repository.TaskRepository;
 import com.github.aliwocha.taskmanager.service.CategoryService;
@@ -48,7 +49,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public List<TaskDto> getCategoryTasks(Long categoryId) {
+    public List<TaskResponse> getCategoryTasks(Long categoryId) {
         return categoryRepository.findById(categoryId)
                 .map(Category::getTasks)
                 .orElseThrow(CategoryNotFoundException::new)
@@ -58,37 +59,37 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public CategoryDto addCategory(CategoryDto category) {
-        Optional<Category> categoryByName = categoryRepository.findByNameIgnoreCase(category.getName());
+    public CategoryResponse addCategory(CategoryRequest categoryRequest) {
+        Optional<Category> categoryByName = categoryRepository.findByNameIgnoreCase(categoryRequest.getCategoryName());
         if (categoryByName.isPresent()) {
             throw new DuplicateCategoryException();
         }
 
-        return mapAndSaveCategory(category);
+        return mapAndSaveCategory(categoryRequest);
     }
 
     @Override
-    public CategoryDto updateCategory(CategoryDto category) {
-        Optional<Category> categoryByName = categoryRepository.findByNameIgnoreCase(category.getName());
+    public CategoryResponse updateCategory(CategoryRequest categoryRequest) {
+        Optional<Category> categoryByName = categoryRepository.findByNameIgnoreCase(categoryRequest.getCategoryName());
         categoryByName.ifPresent(c -> {
-            if (!c.getId().equals(category.getId())) {
+            if (!c.getId().equals(categoryRequest.getId())) {
                 throw new DuplicateCategoryException();
             }
         });
 
-        Optional<Category> categoryById = categoryRepository.findById(category.getId());
+        Optional<Category> categoryById = categoryRepository.findById(categoryRequest.getId());
         categoryById.ifPresent(c -> {
             if (c.getName().equals(DEFAULT_CATEGORY_NAME)) {
                 throw new CategoryForbiddenException("This category cannot be updated");
             }
         });
 
-        return mapAndSaveCategory(category);
+        return mapAndSaveCategory(categoryRequest);
     }
 
-    private CategoryDto mapAndSaveCategory(CategoryDto category) {
-        Category categoryEntity = CategoryMapper.toEntity(category);
-        Category savedCategory = categoryRepository.save(categoryEntity);
+    private CategoryResponse mapAndSaveCategory(CategoryRequest categoryRequest) {
+        Category category = CategoryMapper.toEntity(categoryRequest);
+        Category savedCategory = categoryRepository.save(category);
         return CategoryMapper.toDto(savedCategory);
     }
 

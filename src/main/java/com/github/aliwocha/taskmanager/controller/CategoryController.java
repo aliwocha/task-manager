@@ -1,15 +1,24 @@
 package com.github.aliwocha.taskmanager.controller;
 
-import com.github.aliwocha.taskmanager.dto.CategoryDto;
-import com.github.aliwocha.taskmanager.dto.TaskDto;
+import com.github.aliwocha.taskmanager.dto.request.CategoryRequest;
+import com.github.aliwocha.taskmanager.dto.response.CategoryResponse;
+import com.github.aliwocha.taskmanager.dto.response.TaskResponse;
 import com.github.aliwocha.taskmanager.exception.general.IdForbiddenException;
 import com.github.aliwocha.taskmanager.exception.general.IdNotMatchingException;
 import com.github.aliwocha.taskmanager.service.impl.CategoryServiceImpl;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import javax.validation.Valid;
 import java.net.URI;
 import java.util.List;
 
@@ -39,18 +48,18 @@ public class CategoryController {
 
     @ApiOperation(value = "Get tasks by category id")
     @GetMapping("/{categoryId}/tasks")
-    public ResponseEntity<List<TaskDto>> getCategoryTasks(@PathVariable Long categoryId) {
+    public ResponseEntity<List<TaskResponse>> getCategoryTasks(@PathVariable Long categoryId) {
         return ResponseEntity.ok(categoryService.getCategoryTasks(categoryId));
     }
 
     @ApiOperation(value = "Add category", notes = "Category id must not be provided.")
     @PostMapping
-    public ResponseEntity<CategoryDto> addCategory(@RequestBody CategoryDto category) {
-        if (category.getId() != null) {
+    public ResponseEntity<CategoryResponse> addCategory(@Valid @RequestBody CategoryRequest categoryRequest) {
+        if (categoryRequest.getId() != null) {
             throw new IdForbiddenException();
         }
 
-        CategoryDto savedCategory = categoryService.addCategory(category);
+        CategoryResponse savedCategory = categoryService.addCategory(categoryRequest);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
                 .path("/{id}")
@@ -62,17 +71,17 @@ public class CategoryController {
 
     @ApiOperation(value = "Update category")
     @PutMapping("/{id}")
-    public ResponseEntity<CategoryDto> updateCategory(@RequestBody CategoryDto category, @PathVariable Long id) {
-        if (!id.equals(category.getId())) {
+    public ResponseEntity<CategoryResponse> updateCategory(@Valid @RequestBody CategoryRequest categoryRequest, @PathVariable Long id) {
+        if (!id.equals(categoryRequest.getId())) {
             throw new IdNotMatchingException();
         }
 
-        return ResponseEntity.ok(categoryService.updateCategory(category));
+        return ResponseEntity.ok(categoryService.updateCategory(categoryRequest));
     }
 
     @ApiOperation(value = "Delete category by id")
     @DeleteMapping("/{id}")
-    public ResponseEntity<CategoryDto> deleteCategory(@PathVariable Long id) {
+    public ResponseEntity<CategoryResponse> deleteCategory(@PathVariable Long id) {
         categoryService.deleteCategory(id);
         return ResponseEntity.noContent().build();
     }

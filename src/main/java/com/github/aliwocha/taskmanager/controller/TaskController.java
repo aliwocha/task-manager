@@ -1,6 +1,7 @@
 package com.github.aliwocha.taskmanager.controller;
 
-import com.github.aliwocha.taskmanager.dto.TaskDto;
+import com.github.aliwocha.taskmanager.dto.request.TaskRequest;
+import com.github.aliwocha.taskmanager.dto.response.TaskResponse;
 import com.github.aliwocha.taskmanager.exception.general.IdForbiddenException;
 import com.github.aliwocha.taskmanager.exception.general.IdNotMatchingException;
 import com.github.aliwocha.taskmanager.service.impl.TaskServiceImpl;
@@ -9,9 +10,18 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import javax.validation.Valid;
 import java.net.URI;
 
 @RestController
@@ -26,8 +36,8 @@ public class TaskController {
 
     @ApiOperation(value = "Get all tasks paginated", notes = "Specify additional parameters to adjust page no., page size, offset etc.")
     @GetMapping
-    public ResponseEntity<Page<TaskDto>> getTasksPaginated(@RequestParam(required = false) String status,
-                                                           @PageableDefault Pageable pageable) {
+    public ResponseEntity<Page<TaskResponse>> getTasksPaginated(@RequestParam(required = false) String status,
+                                                                @PageableDefault Pageable pageable) {
         if (status != null) {
             return ResponseEntity.ok(taskService.getTasksByStatusPaginated(status, pageable));
         } else {
@@ -37,7 +47,7 @@ public class TaskController {
 
     @ApiOperation(value = "Get task by id")
     @GetMapping("/{id}")
-    public ResponseEntity<TaskDto> getTask(@PathVariable Long id) {
+    public ResponseEntity<TaskResponse> getTask(@PathVariable Long id) {
         return taskService.getTask(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
@@ -46,12 +56,12 @@ public class TaskController {
     @ApiOperation(value = "Add task", notes = "Possible task priority: LOW, MEDIUM, HIGH.\n" + "Possible task status: NEW.\n" +
             "Provide deadline in format: yyyy-MM-dd.\n" + "Task id must not be provided.")
     @PostMapping
-    public ResponseEntity<TaskDto> addTask(@RequestBody TaskDto task) {
-        if (task.getId() != null) {
+    public ResponseEntity<TaskResponse> addTask(@Valid @RequestBody TaskRequest taskRequest) {
+        if (taskRequest.getId() != null) {
             throw new IdForbiddenException();
         }
 
-        TaskDto savedTask = taskService.addTask(task);
+        TaskResponse savedTask = taskService.addTask(taskRequest);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
                 .path("/{id}")
@@ -64,17 +74,17 @@ public class TaskController {
     @ApiOperation(value = "Update task", notes = "Possible task priority: LOW, MEDIUM, HIGH.\n" + "Possible task status: " +
             "NEW, IN_PROGRESS, COMPLETED, OVERDUE.\n" + "Provide deadline in format: yyyy-MM-dd.")
     @PutMapping("/{id}")
-    public ResponseEntity<TaskDto> updateTask(@RequestBody TaskDto task, @PathVariable Long id) {
-        if (!id.equals(task.getId())) {
+    public ResponseEntity<TaskResponse> updateTask(@Valid @RequestBody TaskRequest taskRequest, @PathVariable Long id) {
+        if (!id.equals(taskRequest.getId())) {
             throw new IdNotMatchingException();
         }
 
-        return ResponseEntity.ok(taskService.updateTask(task));
+        return ResponseEntity.ok(taskService.updateTask(taskRequest));
     }
 
     @ApiOperation(value = "Delete task by id")
     @DeleteMapping("/{id}")
-    public ResponseEntity<TaskDto> deleteTask(@PathVariable Long id) {
+    public ResponseEntity<TaskResponse> deleteTask(@PathVariable Long id) {
         taskService.deleteTask(id);
         return ResponseEntity.noContent().build();
     }

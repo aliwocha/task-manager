@@ -1,6 +1,6 @@
-package com.github.aliwocha.taskmanager.mapper;
+package com.github.aliwocha.taskmanager.dto.mapper;
 
-import com.github.aliwocha.taskmanager.dto.RegistrationDto;
+import com.github.aliwocha.taskmanager.dto.request.RegistrationRequest;
 import com.github.aliwocha.taskmanager.entity.Role;
 import com.github.aliwocha.taskmanager.entity.User;
 import com.github.aliwocha.taskmanager.repository.RoleRepository;
@@ -22,20 +22,11 @@ public class RegistrationMapper {
         this.roleRepository = roleRepository;
     }
 
-    public RegistrationDto toDto(User user) {
-        RegistrationDto dto = new RegistrationDto();
-        dto.setId(user.getId());
-        dto.setLogin(user.getLogin());
-        dto.setEmail(user.getEmail());
-
-        return dto;
-    }
-
-    public User toEntity(RegistrationDto registrationDto) {
+    public User toEntity(RegistrationRequest registrationRequest) {
         User user = new User();
-        user.setLogin(registrationDto.getLogin());
-        user.setPassword(passwordEncoder.encode(registrationDto.getPassword()));
-        user.setEmail(registrationDto.getEmail());
+        user.setLogin(registrationRequest.getLogin());
+        user.setPassword(passwordEncoder.encode(registrationRequest.getPassword()));
+        user.setEmail(registrationRequest.getEmail());
         user.setEnabled(false);
         Optional<Role> role = roleRepository.findByNameIgnoreCase(DEFAULT_USER_ROLE);
         role.ifPresent(user::setRole);
