@@ -7,6 +7,8 @@ import com.github.aliwocha.taskmanager.entity.User;
 import com.github.aliwocha.taskmanager.repository.RoleRepository;
 import org.springframework.stereotype.Component;
 
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.Optional;
 
 @Component
@@ -37,6 +39,7 @@ public class UserMapper {
         user.setPassword(userRequest.getPassword());
         user.setEmail(userRequest.getEmail());
         user.setEnabled(false);
+        user.setRegistrationDate(Timestamp.from(Instant.now()));
         Optional<Role> role = roleRepository.findByNameIgnoreCase(userRequest.getRole());
         role.ifPresent(user::setRole);
 

@@ -28,6 +28,7 @@ public class RegistrationMapper {
         user.setPassword(passwordEncoder.encode(registrationRequest.getPassword()));
         user.setEmail(registrationRequest.getEmail());
         user.setEnabled(false);
+        user.setRegistrationDate(registrationRequest.getRegistrationDate());
         Optional<Role> role = roleRepository.findByNameIgnoreCase(DEFAULT_USER_ROLE);
         role.ifPresent(user::setRole);
 

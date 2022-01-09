@@ -8,6 +8,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import java.sql.Timestamp;
 import java.util.Objects;
 
 @Entity
@@ -29,6 +30,9 @@ public class User {
 
     @Column(name = "enabled", nullable = false)
     private Boolean isEnabled;
+
+    @Column(name = "registration_date", length = 50, nullable = false)
+    private Timestamp registrationDate;
 
     @ManyToOne
     @JoinColumn(name = "role_id")
@@ -70,8 +74,16 @@ public class User {
         return isEnabled;
     }
 
-    public void setEnabled(Boolean enabled) {
-        isEnabled = enabled;
+    public void setEnabled(Boolean isEnabled) {
+        this.isEnabled = isEnabled;
+    }
+
+    public Timestamp getRegistrationDate() {
+        return registrationDate;
+    }
+
+    public void setRegistrationDate(Timestamp registrationDate) {
+        this.registrationDate = registrationDate;
     }
 
     public Role getRole() {
@@ -87,14 +99,18 @@ public class User {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         User user = (User) o;
-        return Objects.equals(id, user.id) && Objects.equals(login, user.login)
-                && Objects.equals(password, user.password) && Objects.equals(email, user.email)
-                && Objects.equals(isEnabled, user.isEnabled) && Objects.equals(role, user.role);
+        return Objects.equals(id, user.id)
+                && Objects.equals(login, user.login)
+                && Objects.equals(password, user.password)
+                && Objects.equals(email, user.email)
+                && Objects.equals(isEnabled, user.isEnabled)
+                && Objects.equals(registrationDate, user.registrationDate)
+                && Objects.equals(role, user.role);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, login, password, email, isEnabled, role);
+        return Objects.hash(id, login, password, email, isEnabled, registrationDate, role);
     }
 
     @Override
@@ -105,6 +121,7 @@ public class User {
                 ", password=" + password +
                 ", email=" + email +
                 ", isEnabled=" + isEnabled +
+                ", registrationDate=" + registrationDate +
                 ", role=" + role.getName() +
                 ']';
     }
