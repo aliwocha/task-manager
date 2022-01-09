@@ -6,13 +6,12 @@ import javax.validation.constraints.Size;
 
 public class RegistrationRequest {
 
-    // TODO: delete id
-    private Long id;
-
+    // TODO: Add regexp pattern
     @NotBlank(message = "Login is mandatory")
     @Size(min = 4, max = 100, message = "Login must have between 4 and 100 characters")
     private String login;
 
+    // TODO: Add regexp pattern
     @NotBlank(message = "Password is mandatory")
     @Size(min = 8, max = 100, message = "Password must have between 8 and 100 characters")
     private String password;
@@ -22,13 +21,7 @@ public class RegistrationRequest {
     @Size(max = 100, message = "Email must have max 100 characters")
     private String email;
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
+    // TODO: Add timestamp
 
     public String getLogin() {
         return login;

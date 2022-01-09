@@ -33,7 +33,6 @@ public class UserMapper {
 
     public User toEntity(UserRequest userRequest) {
         User user = new User();
-        user.setId(userRequest.getId());
         user.setLogin(userRequest.getLogin());
         user.setPassword(userRequest.getPassword());
         user.setEmail(userRequest.getEmail());

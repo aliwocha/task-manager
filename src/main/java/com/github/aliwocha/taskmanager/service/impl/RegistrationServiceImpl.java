@@ -38,16 +38,10 @@ public class RegistrationServiceImpl implements RegistrationService {
     @Override
     public String confirmEmail(String token) {
         ConfirmationToken confirmationToken = confirmationTokenService.getToken(token);
-
-        if (confirmationToken.getConfirmedAt() != null) {
-            throw new EmailAlreadyConfirmedException();
-        }
+        checkIfEmailAlreadyConfirmed(confirmationToken);
 
         LocalDateTime expiresAt = confirmationToken.getExpiresAt();
-
-        if (expiresAt.isBefore(LocalDateTime.now())) {
-            throw new TokenExpiredException();
-        }
+        checkIfTokenAlreadyExpired(expiresAt);
 
         confirmationToken.setConfirmedAt(LocalDateTime.now());
         confirmationTokenService.saveToken(confirmationToken);
@@ -55,6 +49,18 @@ public class RegistrationServiceImpl implements RegistrationService {
         accountDetailsService.enableUser(confirmationToken.getUser());
 
         return String.format("Email '%s' confirmed", confirmationToken.getUser().getEmail());
+    }
+
+    private void checkIfEmailAlreadyConfirmed(ConfirmationToken confirmationToken) {
+        if (confirmationToken.getConfirmedAt() != null) {
+            throw new EmailAlreadyConfirmedException();
+        }
+    }
+
+    private void checkIfTokenAlreadyExpired(LocalDateTime expiresAt) {
+        if (expiresAt.isBefore(LocalDateTime.now())) {
+            throw new TokenExpiredException();
+        }
     }
 
     @Override

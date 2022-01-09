@@ -6,9 +6,6 @@ import javax.validation.constraints.Size;
 
 public class UserRequest {
 
-    // TODO: delete id
-    private Long id;
-
     @NotBlank(message = "Login is mandatory")
     @Size(min = 4, max = 100, message = "Login must have between 4 and 100 characters")
     private String login;
@@ -25,14 +22,6 @@ public class UserRequest {
     @NotBlank(message = "Role is mandatory")
     @Size(max = 50, message = "Role must have max 50 characters")
     private String role;
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
 
     public String getLogin() {
         return login;

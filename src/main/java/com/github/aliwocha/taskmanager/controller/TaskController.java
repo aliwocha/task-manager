@@ -2,13 +2,12 @@ package com.github.aliwocha.taskmanager.controller;
 
 import com.github.aliwocha.taskmanager.dto.request.TaskRequest;
 import com.github.aliwocha.taskmanager.dto.response.TaskResponse;
-import com.github.aliwocha.taskmanager.exception.general.IdForbiddenException;
-import com.github.aliwocha.taskmanager.exception.general.IdNotMatchingException;
 import com.github.aliwocha.taskmanager.service.impl.TaskServiceImpl;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.data.web.SortDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -37,6 +36,7 @@ public class TaskController {
     @ApiOperation(value = "Get all tasks paginated", notes = "Specify additional parameters to adjust page no., page size, offset etc.")
     @GetMapping
     public ResponseEntity<Page<TaskResponse>> getTasksPaginated(@RequestParam(required = false) String status,
+                                                                @SortDefault(sort = "deadline")
                                                                 @PageableDefault Pageable pageable) {
         if (status != null) {
             return ResponseEntity.ok(taskService.getTasksByStatusPaginated(status, pageable));
@@ -54,13 +54,9 @@ public class TaskController {
     }
 
     @ApiOperation(value = "Add task", notes = "Possible task priority: LOW, MEDIUM, HIGH.\n" + "Possible task status: NEW.\n" +
-            "Provide deadline in format: yyyy-MM-dd.\n" + "Task id must not be provided.")
+            "Provide deadline in format: yyyy-MM-dd.")
     @PostMapping
     public ResponseEntity<TaskResponse> addTask(@Valid @RequestBody TaskRequest taskRequest) {
-        if (taskRequest.getId() != null) {
-            throw new IdForbiddenException();
-        }
-
         TaskResponse savedTask = taskService.addTask(taskRequest);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
@@ -75,11 +71,7 @@ public class TaskController {
             "NEW, IN_PROGRESS, COMPLETED, OVERDUE.\n" + "Provide deadline in format: yyyy-MM-dd.")
     @PutMapping("/{id}")
     public ResponseEntity<TaskResponse> updateTask(@Valid @RequestBody TaskRequest taskRequest, @PathVariable Long id) {
-        if (!id.equals(taskRequest.getId())) {
-            throw new IdNotMatchingException();
-        }
-
-        return ResponseEntity.ok(taskService.updateTask(taskRequest));
+        return ResponseEntity.ok(taskService.updateTask(taskRequest, id));
     }
 
     @ApiOperation(value = "Delete task by id")

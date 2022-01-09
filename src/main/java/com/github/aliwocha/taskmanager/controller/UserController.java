@@ -2,8 +2,6 @@ package com.github.aliwocha.taskmanager.controller;
 
 import com.github.aliwocha.taskmanager.dto.request.UserRequest;
 import com.github.aliwocha.taskmanager.dto.response.UserResponse;
-import com.github.aliwocha.taskmanager.exception.general.IdForbiddenException;
-import com.github.aliwocha.taskmanager.exception.general.IdNotMatchingException;
 import com.github.aliwocha.taskmanager.service.impl.UserServiceImpl;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.ResponseEntity;
@@ -45,13 +43,9 @@ public class UserController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @ApiOperation(value = "Add user", notes = "Possible roles: \"user\", \"admin\".\n" + "User id must not be provided.")
+    @ApiOperation(value = "Add user", notes = "Possible roles: \"user\", \"admin\".")
     @PostMapping
     public ResponseEntity<UserResponse> addUser(@Valid @RequestBody UserRequest userRequest) {
-        if (userRequest.getId() != null) {
-            throw new IdForbiddenException();
-        }
-
         UserResponse savedUser = userService.addUser(userRequest);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
@@ -65,11 +59,7 @@ public class UserController {
     @ApiOperation(value = "Update user", notes = "Possible roles: \"user\", \"admin\".")
     @PutMapping("/{id}")
     public ResponseEntity<UserResponse> updateUser(@Valid @RequestBody UserRequest userRequest, @PathVariable Long id) {
-        if (!id.equals(userRequest.getId())) {
-            throw new IdNotMatchingException();
-        }
-
-        return ResponseEntity.ok(userService.updateUser(userRequest));
+        return ResponseEntity.ok(userService.updateUser(userRequest, id));
     }
 
     @ApiOperation(value = "Delete user by id")

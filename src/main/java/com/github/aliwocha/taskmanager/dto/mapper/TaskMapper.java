@@ -35,7 +35,6 @@ public class TaskMapper {
 
     public Task toEntity(TaskRequest taskRequest) {
         Task task = new Task();
-        task.setId(taskRequest.getId());
         task.setTitle(taskRequest.getTitle());
         task.setDescription(taskRequest.getDescription());
         Optional<Category> category = categoryRepository.findByNameIgnoreCase(taskRequest.getCategory());

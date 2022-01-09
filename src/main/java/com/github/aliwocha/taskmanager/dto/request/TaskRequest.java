@@ -9,9 +9,6 @@ import java.time.LocalDate;
 
 public class TaskRequest {
 
-    // TODO: delete id
-    private Long id;
-
     @NotBlank(message = "Title is mandatory")
     @Size(max = 250, message = "Title must have max 250 characters")
     private String title;
@@ -33,14 +30,6 @@ public class TaskRequest {
 
     @Size(max = 50, message = "Deadline must have max 50 characters")
     private LocalDate deadline;
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
 
     public String getTitle() {
         return title;

@@ -44,18 +44,25 @@ public class AccountDetailsServiceImpl implements AccountDetailsService, UserDet
     @Transactional
     @Override
     public String registerUser(User user) {
+        checkIfDuplicatedUser(user);
+        checkIfDuplicatedEmail(user);
+
+        userRepository.save(user);
+        return sendConfirmationEmail(user);
+    }
+
+    private void checkIfDuplicatedUser(User user) {
         Optional<User> userByLogin = userRepository.findByLoginIgnoreCase(user.getLogin());
         if (userByLogin.isPresent()) {
             throw new DuplicateUserException();
         }
+    }
 
+    private void checkIfDuplicatedEmail(User user) {
         Optional<User> userByEmail = userRepository.findByEmailIgnoreCase(user.getEmail());
         if (userByEmail.isPresent()) {
             throw new DuplicateEmailException();
         }
-
-        userRepository.save(user);
-        return sendConfirmationEmail(user);
     }
 
     @Override
@@ -71,14 +78,18 @@ public class AccountDetailsServiceImpl implements AccountDetailsService, UserDet
         }
 
         User user = userByLogin.get();
+        verifyUser(email, user);
+
+        return sendConfirmationEmail(user);
+    }
+
+    private void verifyUser(String email, User user) {
         if (!email.equals(user.getEmail())) {
             throw new InvalidEmailException("Invalid email for given login");
         } else if (user.isEnabled()) {
             throw new EmailAlreadyConfirmedException();
         } else if (!confirmationTokenService.checkIfAllTokensExpired(user)) {
             throw new TokenNotExpiredException();
-        } else {
-            return sendConfirmationEmail(user);
         }
     }
 
@@ -87,7 +98,6 @@ public class AccountDetailsServiceImpl implements AccountDetailsService, UserDet
         confirmationTokenService.saveToken(confirmationToken);
 
         String tokenValue = confirmationToken.getToken();
-
         String url = "http://localhost:8080/api/register/confirm?token=" + tokenValue;
 
         emailService.sendEmail(user.getEmail(), "Confirm your email",

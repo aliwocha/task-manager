@@ -3,6 +3,7 @@ package com.github.aliwocha.taskmanager.service.impl;
 import com.github.aliwocha.taskmanager.dto.mapper.UserMapper;
 import com.github.aliwocha.taskmanager.dto.request.UserRequest;
 import com.github.aliwocha.taskmanager.dto.response.UserResponse;
+import com.github.aliwocha.taskmanager.entity.Role;
 import com.github.aliwocha.taskmanager.entity.User;
 import com.github.aliwocha.taskmanager.exception.role.RoleNotFoundException;
 import com.github.aliwocha.taskmanager.exception.user.DuplicateUserException;
@@ -44,36 +45,59 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserResponse addUser(UserRequest userRequest) {
-        Optional<User> userByLogin = userRepository.findByLoginIgnoreCase(userRequest.getLogin());
-        if (userByLogin.isPresent()) {
-            throw new DuplicateUserException();
-        }
+        checkIfDuplicatedUser(userRequest);
 
-        roleRepository.findByNameIgnoreCase(userRequest.getRole())
-                .orElseThrow(RoleNotFoundException::new);
+        Optional<Role> roleByName = roleRepository.findByNameIgnoreCase(userRequest.getRole());
+        if (roleByName.isEmpty()) {
+            throw new RoleNotFoundException();
+        }
 
         return mapAndSaveUser(userRequest);
     }
 
-    @Override
-    public UserResponse updateUser(UserRequest userRequest) {
+    private void checkIfDuplicatedUser(UserRequest userRequest) {
         Optional<User> userByLogin = userRepository.findByLoginIgnoreCase(userRequest.getLogin());
-        userByLogin.ifPresent(u -> {
-            if (!u.getId().equals(userRequest.getId())) {
-                throw new DuplicateUserException();
-            }
-        });
-
-        roleRepository.findByNameIgnoreCase(userRequest.getRole())
-                .orElseThrow(RoleNotFoundException::new);
-
-        return mapAndSaveUser(userRequest);
+        if (userByLogin.isPresent()) {
+            throw new DuplicateUserException();
+        }
     }
 
     private UserResponse mapAndSaveUser(UserRequest userRequest) {
         User user = userMapper.toEntity(userRequest);
         User savedUser = userRepository.save(user);
         return userMapper.toDto(savedUser);
+    }
+
+    @Override
+    public UserResponse updateUser(UserRequest userRequest, Long id) {
+        User user = userRepository.findById(id).orElseThrow(UserNotFoundException::new);
+        checkIfDuplicatedUser(userRequest, id);
+
+        Optional<Role> roleByName = roleRepository.findByNameIgnoreCase(userRequest.getRole());
+        if (roleByName.isEmpty()) {
+            throw new RoleNotFoundException();
+        }
+
+        return updateAndSaveUser(user, userRequest, roleByName.get());
+    }
+
+    private void checkIfDuplicatedUser(UserRequest userRequest, Long id) {
+        Optional<User> userByLogin = userRepository.findByLoginIgnoreCase(userRequest.getLogin());
+        userByLogin.ifPresent(user -> {
+            if (!user.getId().equals(id)) {
+                throw new DuplicateUserException();
+            }
+        });
+    }
+
+    private UserResponse updateAndSaveUser(User user, UserRequest userRequest, Role role) {
+        user.setLogin(userRequest.getLogin());
+        user.setPassword(userRequest.getPassword());
+        user.setEmail(userRequest.getEmail());
+        user.setRole(role);
+
+        User updatedUser = userRepository.save(user);
+        return userMapper.toDto(updatedUser);
     }
 
     @Override

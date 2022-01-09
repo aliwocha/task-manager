@@ -18,7 +18,6 @@ public class CategoryMapper {
 
     public static Category toEntity(CategoryRequest categoryRequest) {
         Category category = new Category();
-        category.setId(categoryRequest.getId());
         category.setName(categoryRequest.getCategoryName());
 
         return category;

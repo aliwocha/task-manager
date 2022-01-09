@@ -27,7 +27,7 @@ public class CategoryServiceImpl implements CategoryService {
     private final TaskRepository taskRepository;
     private final TaskMapper taskMapper;
 
-    private final String DEFAULT_CATEGORY_NAME = "No category";
+    private static final String DEFAULT_CATEGORY_NAME = "No category";
 
     public CategoryServiceImpl(CategoryRepository categoryRepository, TaskRepository taskRepository, TaskMapper taskMapper) {
         this.categoryRepository = categoryRepository;
@@ -60,31 +60,15 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public CategoryResponse addCategory(CategoryRequest categoryRequest) {
+        checkIfDuplicatedCategory(categoryRequest);
+        return mapAndSaveCategory(categoryRequest);
+    }
+
+    private void checkIfDuplicatedCategory(CategoryRequest categoryRequest) {
         Optional<Category> categoryByName = categoryRepository.findByNameIgnoreCase(categoryRequest.getCategoryName());
         if (categoryByName.isPresent()) {
             throw new DuplicateCategoryException();
         }
-
-        return mapAndSaveCategory(categoryRequest);
-    }
-
-    @Override
-    public CategoryResponse updateCategory(CategoryRequest categoryRequest) {
-        Optional<Category> categoryByName = categoryRepository.findByNameIgnoreCase(categoryRequest.getCategoryName());
-        categoryByName.ifPresent(c -> {
-            if (!c.getId().equals(categoryRequest.getId())) {
-                throw new DuplicateCategoryException();
-            }
-        });
-
-        Optional<Category> categoryById = categoryRepository.findById(categoryRequest.getId());
-        categoryById.ifPresent(c -> {
-            if (c.getName().equals(DEFAULT_CATEGORY_NAME)) {
-                throw new CategoryForbiddenException("This category cannot be updated");
-            }
-        });
-
-        return mapAndSaveCategory(categoryRequest);
     }
 
     private CategoryResponse mapAndSaveCategory(CategoryRequest categoryRequest) {
@@ -94,15 +78,43 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public void deleteCategory(Long id) {
+    public CategoryResponse updateCategory(CategoryRequest categoryRequest, Long id) {
         Category category = categoryRepository.findById(id).orElseThrow(CategoryNotFoundException::new);
 
-        if (category.getName().equals(DEFAULT_CATEGORY_NAME)) {
-            throw new CategoryForbiddenException("This category cannot be deleted");
-        }
+        checkIfDuplicatedCategory(categoryRequest, id);
+        checkIfDefaultCategoryName(category);
+
+        return updateAndSaveCategory(category, categoryRequest);
+    }
+
+    private void checkIfDuplicatedCategory(CategoryRequest categoryRequest, Long id) {
+        Optional<Category> categoryByName = categoryRepository.findByNameIgnoreCase(categoryRequest.getCategoryName());
+        categoryByName.ifPresent(category -> {
+            if (!category.getId().equals(id)) {
+                throw new DuplicateCategoryException();
+            }
+        });
+    }
+
+    private CategoryResponse updateAndSaveCategory(Category category, CategoryRequest categoryRequest) {
+        category.setName(categoryRequest.getCategoryName());
+        Category updatedCategory = categoryRepository.save(category);
+        return CategoryMapper.toDto(updatedCategory);
+    }
+
+    @Override
+    public void deleteCategory(Long id) {
+        Category category = categoryRepository.findById(id).orElseThrow(CategoryNotFoundException::new);
+        checkIfDefaultCategoryName(category);
 
         updateTasksBeforeDelete(id);
         categoryRepository.deleteById(id);
+    }
+
+    private void checkIfDefaultCategoryName(Category category) {
+        if (category.getName().equals(DEFAULT_CATEGORY_NAME)) {
+            throw new CategoryForbiddenException("This category cannot be updated");
+        }
     }
 
     private void updateTasksBeforeDelete(Long id) {

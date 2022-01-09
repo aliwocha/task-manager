@@ -3,8 +3,6 @@ package com.github.aliwocha.taskmanager.controller;
 import com.github.aliwocha.taskmanager.dto.request.CategoryRequest;
 import com.github.aliwocha.taskmanager.dto.response.CategoryResponse;
 import com.github.aliwocha.taskmanager.dto.response.TaskResponse;
-import com.github.aliwocha.taskmanager.exception.general.IdForbiddenException;
-import com.github.aliwocha.taskmanager.exception.general.IdNotMatchingException;
 import com.github.aliwocha.taskmanager.service.impl.CategoryServiceImpl;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.ResponseEntity;
@@ -52,13 +50,9 @@ public class CategoryController {
         return ResponseEntity.ok(categoryService.getCategoryTasks(categoryId));
     }
 
-    @ApiOperation(value = "Add category", notes = "Category id must not be provided.")
+    @ApiOperation(value = "Add category")
     @PostMapping
     public ResponseEntity<CategoryResponse> addCategory(@Valid @RequestBody CategoryRequest categoryRequest) {
-        if (categoryRequest.getId() != null) {
-            throw new IdForbiddenException();
-        }
-
         CategoryResponse savedCategory = categoryService.addCategory(categoryRequest);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
@@ -72,11 +66,7 @@ public class CategoryController {
     @ApiOperation(value = "Update category")
     @PutMapping("/{id}")
     public ResponseEntity<CategoryResponse> updateCategory(@Valid @RequestBody CategoryRequest categoryRequest, @PathVariable Long id) {
-        if (!id.equals(categoryRequest.getId())) {
-            throw new IdNotMatchingException();
-        }
-
-        return ResponseEntity.ok(categoryService.updateCategory(categoryRequest));
+        return ResponseEntity.ok(categoryService.updateCategory(categoryRequest, id));
     }
 
     @ApiOperation(value = "Delete category by id")
