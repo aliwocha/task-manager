@@ -23,11 +23,11 @@ INSERT INTO categories(category_name) VALUES
 INSERT INTO tasks(title, description, priority, status, deadline, category_id) VALUES
     ('Zrobić zakupy', 'Spodnie, buty, sweter', 'LOW', 'NEW', null,
         SELECT id FROM categories WHERE category_name = 'Shopping'),
-    ('Pomalować ściany', '', 'MEDIUM', 'NEW', '2021-03-30',
+    ('Pomalować ściany', '', 'MEDIUM', 'NEW', DATE '2021-03-30',
         SELECT id FROM categories WHERE category_name = 'Home'),
     ('Stworzyć aplikację', 'Aplikacja To-Do List', 'HIGH', 'IN_PROGRESS', DATE '2021-04-10',
         SELECT id FROM categories WHERE category_name = 'Work'),
     ('Ukończyć kurs ''Spring - zadania''', 'Kurs programowania z javastart.pl', 'HIGH', 'COMPLETED', DATE '2021-03-24',
         SELECT id FROM categories WHERE category_name = 'Work'),
-    ('Złożyć życzenia babci', '', 'MEDIUM', 'NEW', '2021-03-28',
+    ('Złożyć życzenia babci', '', 'MEDIUM', 'NEW', DATE '2021-03-28',
         SELECT id FROM categories WHERE category_name = 'No category');
