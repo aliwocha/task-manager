@@ -2,6 +2,8 @@ package com.github.aliwocha.taskmanager.dto.request;
 
 import com.github.aliwocha.taskmanager.entity.Task;
 
+import javax.validation.constraints.Digits;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -30,6 +32,11 @@ public class TaskRequest {
 
     @Size(max = 50, message = "Deadline must have max 50 characters")
     private LocalDate deadline;
+
+    @NotNull(message = "User id cannot be null")
+    @Digits(integer = 4, fraction = 0, message = "Invalid number format")
+    @Min(value = 0, message = "User id must be greater or equal to 0")
+    private Long userId;
 
     public String getTitle() {
         return title;
@@ -77,5 +84,13 @@ public class TaskRequest {
 
     public void setDeadline(LocalDate deadline) {
         this.deadline = deadline;
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 }

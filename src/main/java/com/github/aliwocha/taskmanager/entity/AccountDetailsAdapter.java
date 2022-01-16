@@ -40,7 +40,7 @@ public class AccountDetailsAdapter implements UserDetails {
 
     @Override
     public boolean isAccountNonLocked() {
-        return user.isEnabled();
+        return user.getEnabled();
     }
 
     @Override
@@ -50,6 +50,6 @@ public class AccountDetailsAdapter implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return user.isEnabled();
+        return user.getEnabled();
     }
 }

@@ -24,11 +24,13 @@ public class RegistrationMapper {
 
     public User toEntity(RegistrationRequest registrationRequest) {
         User user = new User();
+
         user.setLogin(registrationRequest.getLogin());
         user.setPassword(passwordEncoder.encode(registrationRequest.getPassword()));
         user.setEmail(registrationRequest.getEmail());
         user.setEnabled(false);
         user.setRegistrationDate(registrationRequest.getRegistrationDate());
+
         Optional<Role> role = roleRepository.findByNameIgnoreCase(DEFAULT_USER_ROLE);
         role.ifPresent(user::setRole);
 

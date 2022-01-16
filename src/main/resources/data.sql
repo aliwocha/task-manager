@@ -20,14 +20,19 @@ INSERT INTO categories(category_name) VALUES
     ('Health'),
     ('Travel');
 
-INSERT INTO tasks(title, description, priority, status, deadline, category_id) VALUES
+INSERT INTO tasks(title, description, priority, status, deadline, category_id, user_id) VALUES
     ('Zrobić zakupy', 'Spodnie, buty, sweter', 'LOW', 'NEW', null,
-        SELECT id FROM categories WHERE category_name = 'Shopping'),
+        SELECT id FROM categories WHERE category_name = 'Shopping',
+        SELECT id FROM users WHERE login = 'user'),
     ('Pomalować ściany', '', 'MEDIUM', 'NEW', DATE '2021-03-30',
-        SELECT id FROM categories WHERE category_name = 'Home'),
+        SELECT id FROM categories WHERE category_name = 'Home',
+        SELECT id FROM users WHERE login = 'user'),
     ('Stworzyć aplikację', 'Aplikacja To-Do List', 'HIGH', 'IN_PROGRESS', DATE '2021-04-10',
-        SELECT id FROM categories WHERE category_name = 'Work'),
+        SELECT id FROM categories WHERE category_name = 'Work',
+        SELECT id FROM users WHERE login = 'admin'),
     ('Ukończyć kurs ''Spring - zadania''', 'Kurs programowania z javastart.pl', 'HIGH', 'COMPLETED', DATE '2021-03-24',
-        SELECT id FROM categories WHERE category_name = 'Work'),
+        SELECT id FROM categories WHERE category_name = 'Work',
+        SELECT id FROM users WHERE login = 'admin'),
     ('Złożyć życzenia babci', '', 'MEDIUM', 'NEW', DATE '2021-03-28',
-        SELECT id FROM categories WHERE category_name = 'No category');
+        SELECT id FROM categories WHERE category_name = 'No category',
+        SELECT id FROM users WHERE login = 'user');

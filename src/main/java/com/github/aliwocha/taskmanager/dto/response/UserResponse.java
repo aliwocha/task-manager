@@ -1,11 +1,14 @@
 package com.github.aliwocha.taskmanager.dto.response;
 
+import java.sql.Timestamp;
+
 public class UserResponse {
 
     private Long id;
     private String login;
-    private String password;
     private String email;
+    private Boolean isEnabled;
+    private Timestamp registrationDate;
     private String role;
 
     public Long getId() {
@@ -24,20 +27,28 @@ public class UserResponse {
         this.login = login;
     }
 
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
     public String getEmail() {
         return email;
     }
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public Boolean getEnabled() {
+        return isEnabled;
+    }
+
+    public void setEnabled(Boolean enabled) {
+        isEnabled = enabled;
+    }
+
+    public Timestamp getRegistrationDate() {
+        return registrationDate;
+    }
+
+    public void setRegistrationDate(Timestamp registrationDate) {
+        this.registrationDate = registrationDate;
     }
 
     public String getRole() {

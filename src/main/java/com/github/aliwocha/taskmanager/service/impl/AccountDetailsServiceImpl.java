@@ -1,5 +1,6 @@
 package com.github.aliwocha.taskmanager.service.impl;
 
+import com.github.aliwocha.taskmanager.dto.response.ConfirmationTokenResponse;
 import com.github.aliwocha.taskmanager.entity.AccountDetailsAdapter;
 import com.github.aliwocha.taskmanager.entity.ConfirmationToken;
 import com.github.aliwocha.taskmanager.entity.User;
@@ -43,22 +44,22 @@ public class AccountDetailsServiceImpl implements AccountDetailsService, UserDet
 
     @Transactional
     @Override
-    public String registerUser(User user) {
-        checkIfDuplicatedUser(user);
-        checkIfDuplicatedEmail(user);
+    public ConfirmationTokenResponse registerUser(User user) {
+        checkIfUserNotDuplicated(user);
+        checkIfEmailNotDuplicated(user);
 
         userRepository.save(user);
         return sendConfirmationEmail(user);
     }
 
-    private void checkIfDuplicatedUser(User user) {
+    private void checkIfUserNotDuplicated(User user) {
         Optional<User> userByLogin = userRepository.findByLoginIgnoreCase(user.getLogin());
         if (userByLogin.isPresent()) {
             throw new DuplicateUserException();
         }
     }
 
-    private void checkIfDuplicatedEmail(User user) {
+    private void checkIfEmailNotDuplicated(User user) {
         Optional<User> userByEmail = userRepository.findByEmailIgnoreCase(user.getEmail());
         if (userByEmail.isPresent()) {
             throw new DuplicateEmailException();
@@ -71,7 +72,7 @@ public class AccountDetailsServiceImpl implements AccountDetailsService, UserDet
     }
 
     @Override
-    public String resendConfirmationEmail(String login, String email) {
+    public ConfirmationTokenResponse resendConfirmationEmail(String login, String email) {
         Optional<User> userByLogin = userRepository.findByLoginIgnoreCase(login);
         if (userByLogin.isEmpty()) {
             throw new UserNotFoundException();
@@ -86,14 +87,14 @@ public class AccountDetailsServiceImpl implements AccountDetailsService, UserDet
     private void verifyUser(String email, User user) {
         if (!email.equals(user.getEmail())) {
             throw new InvalidEmailException("Invalid email for given login");
-        } else if (user.isEnabled()) {
+        } else if (user.getEnabled()) {
             throw new EmailAlreadyConfirmedException();
         } else if (!confirmationTokenService.checkIfAllTokensExpired(user)) {
             throw new TokenNotExpiredException();
         }
     }
 
-    private String sendConfirmationEmail(User user) {
+    private ConfirmationTokenResponse sendConfirmationEmail(User user) {
         ConfirmationToken confirmationToken = confirmationTokenService.createToken(user);
         confirmationTokenService.saveToken(confirmationToken);
 
@@ -103,6 +104,6 @@ public class AccountDetailsServiceImpl implements AccountDetailsService, UserDet
         emailService.sendEmail(user.getEmail(), "Confirm your email",
                 "Confirm registration by clicking in the link: " + url, false);
 
-        return tokenValue;
+        return ConfirmationTokenResponse.of(tokenValue);
     }
 }

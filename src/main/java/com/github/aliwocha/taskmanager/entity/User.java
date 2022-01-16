@@ -1,14 +1,19 @@
 package com.github.aliwocha.taskmanager.entity;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 @Entity
@@ -34,9 +39,12 @@ public class User {
     @Column(name = "registration_date", length = 50, nullable = false)
     private Timestamp registrationDate;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "role_id")
     private Role role;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
+    private List<Task> tasks = new ArrayList<>();
 
     public Long getId() {
         return id;
@@ -70,12 +78,12 @@ public class User {
         this.password = password;
     }
 
-    public Boolean isEnabled() {
+    public Boolean getEnabled() {
         return isEnabled;
     }
 
-    public void setEnabled(Boolean isEnabled) {
-        this.isEnabled = isEnabled;
+    public void setEnabled(Boolean enabled) {
+        isEnabled = enabled;
     }
 
     public Timestamp getRegistrationDate() {
@@ -94,17 +102,22 @@ public class User {
         this.role = role;
     }
 
+    public List<Task> getTasks() {
+        return tasks;
+    }
+
+    public void setTasks(List<Task> tasks) {
+        this.tasks = tasks;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         User user = (User) o;
-        return Objects.equals(id, user.id)
-                && Objects.equals(login, user.login)
-                && Objects.equals(password, user.password)
-                && Objects.equals(email, user.email)
-                && Objects.equals(isEnabled, user.isEnabled)
-                && Objects.equals(registrationDate, user.registrationDate)
+        return Objects.equals(id, user.id) && Objects.equals(login, user.login)
+                && Objects.equals(password, user.password) && Objects.equals(email, user.email)
+                && Objects.equals(isEnabled, user.isEnabled) && Objects.equals(registrationDate, user.registrationDate)
                 && Objects.equals(role, user.role);
     }
 

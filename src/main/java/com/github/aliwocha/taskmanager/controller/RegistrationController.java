@@ -1,6 +1,7 @@
 package com.github.aliwocha.taskmanager.controller;
 
 import com.github.aliwocha.taskmanager.dto.request.RegistrationRequest;
+import com.github.aliwocha.taskmanager.dto.response.ConfirmationTokenResponse;
 import com.github.aliwocha.taskmanager.service.RegistrationService;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
@@ -29,13 +30,13 @@ public class RegistrationController {
     @ApiOperation(value = "Register user", notes = "User id must not be provided.")
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
-    public ResponseEntity<String> registerUser(@Valid @RequestBody RegistrationRequest registrationRequest) {
+    public ResponseEntity<ConfirmationTokenResponse> registerUser(@Valid @RequestBody RegistrationRequest registrationRequest) {
         return new ResponseEntity<>(registrationService.registerUser(registrationRequest), HttpStatus.CREATED);
     }
 
     @ApiOperation(value = "Resend confirmation email to user", notes = "User id must not be provided.")
     @PostMapping("/resend-email")
-    public ResponseEntity<String> resendEmail(@Valid @RequestBody RegistrationRequest registrationRequest) {
+    public ResponseEntity<ConfirmationTokenResponse> resendEmail(@Valid @RequestBody RegistrationRequest registrationRequest) {
         return ResponseEntity.ok(registrationService.resendConfirmationEmail(registrationRequest));
     }
 

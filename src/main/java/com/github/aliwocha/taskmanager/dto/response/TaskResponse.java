@@ -13,6 +13,7 @@ public class TaskResponse {
     private Task.Priority priority;
     private Task.Status status;
     private LocalDate deadline;
+    private UserResponse userResponse;
 
     public Long getId() {
         return id;
@@ -68,5 +69,13 @@ public class TaskResponse {
 
     public void setDeadline(LocalDate deadline) {
         this.deadline = deadline;
+    }
+
+    public UserResponse getUserResponse() {
+        return userResponse;
+    }
+
+    public void setUserResponse(UserResponse userResponse) {
+        this.userResponse = userResponse;
     }
 }

@@ -60,11 +60,11 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public CategoryResponse addCategory(CategoryRequest categoryRequest) {
-        checkIfDuplicatedCategory(categoryRequest);
+        checkIfCategoryNotDuplicated(categoryRequest);
         return mapAndSaveCategory(categoryRequest);
     }
 
-    private void checkIfDuplicatedCategory(CategoryRequest categoryRequest) {
+    private void checkIfCategoryNotDuplicated(CategoryRequest categoryRequest) {
         Optional<Category> categoryByName = categoryRepository.findByNameIgnoreCase(categoryRequest.getCategoryName());
         if (categoryByName.isPresent()) {
             throw new DuplicateCategoryException();
@@ -81,13 +81,13 @@ public class CategoryServiceImpl implements CategoryService {
     public CategoryResponse updateCategory(CategoryRequest categoryRequest, Long id) {
         Category category = categoryRepository.findById(id).orElseThrow(CategoryNotFoundException::new);
 
-        checkIfDuplicatedCategory(categoryRequest, id);
+        checkIfCategoryNotDuplicated(categoryRequest, id);
         checkIfDefaultCategoryName(category);
 
         return updateAndSaveCategory(category, categoryRequest);
     }
 
-    private void checkIfDuplicatedCategory(CategoryRequest categoryRequest, Long id) {
+    private void checkIfCategoryNotDuplicated(CategoryRequest categoryRequest, Long id) {
         Optional<Category> categoryByName = categoryRepository.findByNameIgnoreCase(categoryRequest.getCategoryName());
         categoryByName.ifPresent(category -> {
             if (!category.getId().equals(id)) {

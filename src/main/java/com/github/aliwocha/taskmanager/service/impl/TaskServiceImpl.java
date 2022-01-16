@@ -3,12 +3,9 @@ package com.github.aliwocha.taskmanager.service.impl;
 import com.github.aliwocha.taskmanager.dto.mapper.TaskMapper;
 import com.github.aliwocha.taskmanager.dto.request.TaskRequest;
 import com.github.aliwocha.taskmanager.dto.response.TaskResponse;
-import com.github.aliwocha.taskmanager.entity.Category;
 import com.github.aliwocha.taskmanager.entity.Task;
-import com.github.aliwocha.taskmanager.exception.category.CategoryNotFoundException;
 import com.github.aliwocha.taskmanager.exception.task.InvalidTaskException;
 import com.github.aliwocha.taskmanager.exception.task.TaskNotFoundException;
-import com.github.aliwocha.taskmanager.repository.CategoryRepository;
 import com.github.aliwocha.taskmanager.repository.TaskRepository;
 import com.github.aliwocha.taskmanager.service.TaskService;
 import org.springframework.data.domain.Page;
@@ -27,12 +24,10 @@ public class TaskServiceImpl implements TaskService {
 
     private final TaskRepository taskRepository;
     private final TaskMapper taskMapper;
-    private final CategoryRepository categoryRepository;
 
-    public TaskServiceImpl(TaskRepository taskRepository, TaskMapper taskMapper, CategoryRepository categoryRepository) {
+    public TaskServiceImpl(TaskRepository taskRepository, TaskMapper taskMapper) {
         this.taskRepository = taskRepository;
         this.taskMapper = taskMapper;
-        this.categoryRepository = categoryRepository;
     }
 
     @Override
@@ -81,13 +76,7 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public TaskResponse addTask(TaskRequest taskRequest) {
-        Optional<Category> categoryByName = categoryRepository.findByNameIgnoreCase(taskRequest.getCategory());
-        if (categoryByName.isEmpty()) {
-            throw new CategoryNotFoundException();
-        }
-
-        checkIfDeadlineExpired(taskRequest);
-
+        checkIfDeadlineNotExpired(taskRequest);
         taskRequest.setStatus(Task.Status.NEW);
         return mapAndSaveTask(taskRequest);
     }
@@ -102,37 +91,26 @@ public class TaskServiceImpl implements TaskService {
     public TaskResponse updateTask(TaskRequest taskRequest, Long id) {
         Task task = taskRepository.findById(id).orElseThrow(TaskNotFoundException::new);
 
-        Optional<Category> categoryByName = categoryRepository.findByNameIgnoreCase(taskRequest.getCategory());
-        if (categoryByName.isEmpty()) {
-            throw new CategoryNotFoundException();
-        }
+        checkIfDeadlineNotExpired(taskRequest);
+        checkIfStatusNotOverdue(taskRequest);
 
-        checkIfDeadlineExpired(taskRequest);
-        checkIfStatusOverdue(taskRequest);
-
-        return updateAndSaveTask(task, taskRequest, categoryByName.get());
+        return updateAndSaveTask(task, taskRequest);
     }
 
-    private void checkIfDeadlineExpired(TaskRequest taskRequest) {
+    private void checkIfDeadlineNotExpired(TaskRequest taskRequest) {
         if (taskRequest.getDeadline() != null && taskRequest.getDeadline().isBefore(LocalDate.now())) {
             throw new InvalidTaskException("Date must be present or in the future");
         }
     }
 
-    private void checkIfStatusOverdue(TaskRequest taskRequest) {
+    private void checkIfStatusNotOverdue(TaskRequest taskRequest) {
         if (taskRequest.getStatus() == Task.Status.OVERDUE) {
             throw new InvalidTaskException("Status cannot be set to 'OVERDUE'");
         }
     }
 
-    private TaskResponse updateAndSaveTask(Task task, TaskRequest taskRequest, Category category) {
-        task.setTitle(taskRequest.getTitle());
-        task.setDescription(taskRequest.getDescription());
-        task.setCategory(category);
-        task.setPriority(taskRequest.getPriority());
-        task.setStatus(taskRequest.getStatus());
-        task.setDeadline(taskRequest.getDeadline());
-
+    private TaskResponse updateAndSaveTask(Task task, TaskRequest taskRequest) {
+        task = taskMapper.updateEntity(task, taskRequest);
         Task updatedTask = taskRepository.save(task);
         return taskMapper.toDto(updatedTask);
     }

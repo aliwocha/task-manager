@@ -2,6 +2,7 @@ package com.github.aliwocha.taskmanager.service.impl;
 
 import com.github.aliwocha.taskmanager.dto.mapper.RegistrationMapper;
 import com.github.aliwocha.taskmanager.dto.request.RegistrationRequest;
+import com.github.aliwocha.taskmanager.dto.response.ConfirmationTokenResponse;
 import com.github.aliwocha.taskmanager.entity.ConfirmationToken;
 import com.github.aliwocha.taskmanager.entity.User;
 import com.github.aliwocha.taskmanager.exception.email.EmailAlreadyConfirmedException;
@@ -29,7 +30,7 @@ public class RegistrationServiceImpl implements RegistrationService {
     }
 
     @Override
-    public String registerUser(RegistrationRequest registrationRequest) {
+    public ConfirmationTokenResponse registerUser(RegistrationRequest registrationRequest) {
         User user = registrationMapper.toEntity(registrationRequest);
         return accountDetailsService.registerUser(user);
     }
@@ -64,7 +65,7 @@ public class RegistrationServiceImpl implements RegistrationService {
     }
 
     @Override
-    public String resendConfirmationEmail(RegistrationRequest registrationRequest) {
+    public ConfirmationTokenResponse resendConfirmationEmail(RegistrationRequest registrationRequest) {
         return accountDetailsService.resendConfirmationEmail(registrationRequest.getLogin(), registrationRequest.getEmail());
     }
 }

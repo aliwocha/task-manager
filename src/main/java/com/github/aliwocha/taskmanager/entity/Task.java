@@ -42,6 +42,10 @@ public class Task {
     @Column(name = "deadline", length = 50)
     private LocalDate deadline;
 
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
+
     public Long getId() {
         return id;
     }
@@ -98,6 +102,14 @@ public class Task {
         this.deadline = deadline;
     }
 
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
     public boolean isOverdue() {
         return LocalDate.now().isAfter(this.getDeadline());
     }
@@ -109,12 +121,13 @@ public class Task {
         Task task = (Task) o;
         return Objects.equals(id, task.id) && Objects.equals(title, task.title)
                 && Objects.equals(description, task.description) && Objects.equals(category, task.category)
-                && priority == task.priority && status == task.status && Objects.equals(deadline, task.deadline);
+                && priority == task.priority && status == task.status && Objects.equals(deadline, task.deadline)
+                && Objects.equals(user, task.user);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, title, description, category, priority, status, deadline);
+        return Objects.hash(id, title, description, category, priority, status, deadline, user);
     }
 
     @Override
@@ -127,6 +140,7 @@ public class Task {
                 ", priority=" + priority +
                 ", status=" + status +
                 ", deadline=" + deadline +
+                ", user=" + user.getLogin() +
                 ']';
     }
 
