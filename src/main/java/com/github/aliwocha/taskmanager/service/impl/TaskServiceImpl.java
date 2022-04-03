@@ -4,8 +4,10 @@ import com.github.aliwocha.taskmanager.dto.mapper.TaskMapper;
 import com.github.aliwocha.taskmanager.dto.request.TaskRequest;
 import com.github.aliwocha.taskmanager.dto.response.TaskResponse;
 import com.github.aliwocha.taskmanager.entity.Task;
+import com.github.aliwocha.taskmanager.entity.User;
 import com.github.aliwocha.taskmanager.exception.task.InvalidTaskException;
 import com.github.aliwocha.taskmanager.exception.task.TaskNotFoundException;
+import com.github.aliwocha.taskmanager.exception.user.ForbiddenAccessException;
 import com.github.aliwocha.taskmanager.repository.TaskRepository;
 import com.github.aliwocha.taskmanager.service.TaskService;
 import org.springframework.data.domain.Page;
@@ -22,6 +24,8 @@ import java.util.stream.Collectors;
 @Service
 public class TaskServiceImpl implements TaskService {
 
+    private static final String ROLE_USER = "ROLE_USER";
+
     private final TaskRepository taskRepository;
     private final TaskMapper taskMapper;
 
@@ -31,10 +35,9 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public Page<TaskResponse> getTasksPaginated(Pageable pageable) {
-        Page<Task> taskPage = taskRepository.findAll(pageable);
-
-        List<TaskResponse> tasks = taskPage.getContent()
+    public Page<TaskResponse> getTasksPaginated(User user, Pageable pageable) {
+        Page<Task> taskPage = fetchTasks(user, pageable);
+        List<TaskResponse> tasks = fetchTasks(user, pageable).getContent()
                 .stream()
                 .map(taskMapper::toDto)
                 .collect(Collectors.toList());
@@ -43,16 +46,73 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public Page<TaskResponse> getTasksByStatusPaginated(String status, Pageable pageable) {
+    public Page<TaskResponse> getTasksByStatusPaginated(String status, User user, Pageable pageable) {
         List<String> statusNames = prepareStatusNamesList();
         if (!statusNames.contains(status.toUpperCase())) {
             throw new InvalidTaskException("Invalid status name");
         }
 
-        Page<Task> taskPage = taskRepository.findAll(pageable);
-        List<TaskResponse> tasksByStatus = filterTasksByStatus(status, taskPage);
+        Page<Task> taskPage = fetchTasksByStatus(status, user, pageable);
+        List<TaskResponse> tasksByStatus = taskPage.getContent()
+                .stream()
+                .map(taskMapper::toDto)
+                .collect(Collectors.toList());
 
         return new PageImpl<>(tasksByStatus, pageable, taskPage.getTotalElements());
+    }
+
+    @Override
+    public Optional<TaskResponse> getTask(Long id, User user) {
+        Optional<Task> task = taskRepository.findById(id);
+        if (task.isPresent() && user.getRole().getName().equals(ROLE_USER)) {
+            checkIfTaskBelongsToUser(user, task.get());
+        }
+
+        return task.map(taskMapper::toDto);
+    }
+
+    @Override
+    public TaskResponse addTask(TaskRequest taskRequest, User user) {
+        if (!user.getId().equals(taskRequest.getUserId())) {
+            throw new ForbiddenAccessException();
+        }
+
+        checkIfDeadlineNotExpired(taskRequest);
+        taskRequest.setStatus(Task.Status.NEW);
+
+        return mapAndSaveTask(taskRequest);
+    }
+
+    @Override
+    public TaskResponse updateTask(TaskRequest taskRequest, Long id, User user) {
+        Task task = taskRepository.findById(id).orElseThrow(TaskNotFoundException::new);
+
+        checkIfTaskBelongsToUser(user, task);
+        checkIfDeadlineNotExpired(taskRequest);
+        checkIfStatusNotOverdue(taskRequest);
+
+        return updateAndSaveTask(task, taskRequest);
+    }
+
+    @Override
+    public void deleteTask(Long id, User user) {
+        Task task = taskRepository.findById(id).orElseThrow(TaskNotFoundException::new);
+        checkIfTaskBelongsToUser(user, task);
+        taskRepository.deleteById(id);
+    }
+
+    private Page<Task> fetchTasks(User user, Pageable pageable) {
+        if (user.getRole().getName().equals(ROLE_USER)) {
+            return taskRepository.findAllByUser_Id(user.getId(), pageable);
+        }
+        return taskRepository.findAll(pageable);
+    }
+
+    private Page<Task> fetchTasksByStatus(String status, User user, Pageable pageable) {
+        if (user.getRole().getName().equals(ROLE_USER)) {
+            return taskRepository.findAllByStatusAndUser_Id(getStatus(status), user.getId(), pageable);
+        }
+        return taskRepository.findAllByStatus(getStatus(status), pageable);
     }
 
     private List<String> prepareStatusNamesList() {
@@ -61,40 +121,8 @@ public class TaskServiceImpl implements TaskService {
                 .collect(Collectors.toList());
     }
 
-    private List<TaskResponse> filterTasksByStatus(String status, Page<Task> taskPage) {
-        return taskPage.getContent()
-                .stream()
-                .filter(task -> task.getStatus().equals(Task.Status.valueOf(status.toUpperCase())))
-                .map(taskMapper::toDto)
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public Optional<TaskResponse> getTask(Long id) {
-        return taskRepository.findById(id).map(taskMapper::toDto);
-    }
-
-    @Override
-    public TaskResponse addTask(TaskRequest taskRequest) {
-        checkIfDeadlineNotExpired(taskRequest);
-        taskRequest.setStatus(Task.Status.NEW);
-        return mapAndSaveTask(taskRequest);
-    }
-
-    private TaskResponse mapAndSaveTask(TaskRequest taskRequest) {
-        Task task = taskMapper.toEntity(taskRequest);
-        Task savedTask = taskRepository.save(task);
-        return taskMapper.toDto(savedTask);
-    }
-
-    @Override
-    public TaskResponse updateTask(TaskRequest taskRequest, Long id) {
-        Task task = taskRepository.findById(id).orElseThrow(TaskNotFoundException::new);
-
-        checkIfDeadlineNotExpired(taskRequest);
-        checkIfStatusNotOverdue(taskRequest);
-
-        return updateAndSaveTask(task, taskRequest);
+    private Task.Status getStatus(String status) {
+        return Task.Status.valueOf(status.toUpperCase());
     }
 
     private void checkIfDeadlineNotExpired(TaskRequest taskRequest) {
@@ -109,18 +137,21 @@ public class TaskServiceImpl implements TaskService {
         }
     }
 
+    private void checkIfTaskBelongsToUser(User user, Task task) {
+        if (!user.getId().equals(task.getUser().getId())) {
+            throw new ForbiddenAccessException();
+        }
+    }
+
+    private TaskResponse mapAndSaveTask(TaskRequest taskRequest) {
+        Task task = taskMapper.toEntity(taskRequest);
+        Task savedTask = taskRepository.save(task);
+        return taskMapper.toDto(savedTask);
+    }
+
     private TaskResponse updateAndSaveTask(Task task, TaskRequest taskRequest) {
         task = taskMapper.updateEntity(task, taskRequest);
         Task updatedTask = taskRepository.save(task);
         return taskMapper.toDto(updatedTask);
-    }
-
-    @Override
-    public void deleteTask(Long id) {
-        if (!taskRepository.existsById(id)) {
-            throw new TaskNotFoundException();
-        }
-
-        taskRepository.deleteById(id);
     }
 }

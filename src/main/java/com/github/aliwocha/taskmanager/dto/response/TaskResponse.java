@@ -1,9 +1,11 @@
 package com.github.aliwocha.taskmanager.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.github.aliwocha.taskmanager.entity.Task;
 
 import java.time.LocalDate;
 
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class TaskResponse {
 
     private Long id;
@@ -13,7 +15,7 @@ public class TaskResponse {
     private Task.Priority priority;
     private Task.Status status;
     private LocalDate deadline;
-    private UserResponse userResponse;
+    private Long userId;
 
     public Long getId() {
         return id;
@@ -71,11 +73,11 @@ public class TaskResponse {
         this.deadline = deadline;
     }
 
-    public UserResponse getUserResponse() {
-        return userResponse;
+    public Long getUserId() {
+        return userId;
     }
 
-    public void setUserResponse(UserResponse userResponse) {
-        this.userResponse = userResponse;
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 }

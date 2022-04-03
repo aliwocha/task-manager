@@ -2,6 +2,7 @@ package com.github.aliwocha.taskmanager.controller;
 
 import com.github.aliwocha.taskmanager.dto.request.TaskRequest;
 import com.github.aliwocha.taskmanager.dto.response.TaskResponse;
+import com.github.aliwocha.taskmanager.entity.AccountDetailsAdapter;
 import com.github.aliwocha.taskmanager.service.impl.TaskServiceImpl;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.data.domain.Page;
@@ -9,6 +10,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.data.web.SortDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -38,17 +41,19 @@ public class TaskController {
     public ResponseEntity<Page<TaskResponse>> getTasksPaginated(@RequestParam(required = false) String status,
                                                                 @SortDefault(sort = "deadline")
                                                                 @PageableDefault Pageable pageable) {
+        AccountDetailsAdapter accountDetails = getAccountDetails();
         if (status != null) {
-            return ResponseEntity.ok(taskService.getTasksByStatusPaginated(status, pageable));
+            return ResponseEntity.ok(taskService.getTasksByStatusPaginated(status, accountDetails.getUser(), pageable));
         } else {
-            return ResponseEntity.ok(taskService.getTasksPaginated(pageable));
+            return ResponseEntity.ok(taskService.getTasksPaginated(accountDetails.getUser(), pageable));
         }
     }
 
     @ApiOperation(value = "Get task by id")
     @GetMapping("/{id}")
     public ResponseEntity<TaskResponse> getTask(@PathVariable Long id) {
-        return taskService.getTask(id)
+        AccountDetailsAdapter accountDetails = getAccountDetails();
+        return taskService.getTask(id, accountDetails.getUser())
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
@@ -57,7 +62,9 @@ public class TaskController {
             "Provide deadline in format: yyyy-MM-dd.")
     @PostMapping
     public ResponseEntity<TaskResponse> addTask(@Valid @RequestBody TaskRequest taskRequest) {
-        TaskResponse savedTask = taskService.addTask(taskRequest);
+        AccountDetailsAdapter accountDetails = getAccountDetails();
+        TaskResponse savedTask = taskService.addTask(taskRequest, accountDetails.getUser());
+
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
                 .path("/{id}")
@@ -71,13 +78,20 @@ public class TaskController {
             "NEW, IN_PROGRESS, COMPLETED, OVERDUE.\n" + "Provide deadline in format: yyyy-MM-dd.")
     @PutMapping("/{id}")
     public ResponseEntity<TaskResponse> updateTask(@Valid @RequestBody TaskRequest taskRequest, @PathVariable Long id) {
-        return ResponseEntity.ok(taskService.updateTask(taskRequest, id));
+        AccountDetailsAdapter accountDetails = getAccountDetails();
+        return ResponseEntity.ok(taskService.updateTask(taskRequest, id, accountDetails.getUser()));
     }
 
     @ApiOperation(value = "Delete task by id")
     @DeleteMapping("/{id}")
-    public ResponseEntity<TaskResponse> deleteTask(@PathVariable Long id) {
-        taskService.deleteTask(id);
+    public ResponseEntity<Void> deleteTask(@PathVariable Long id) {
+        AccountDetailsAdapter accountDetails = getAccountDetails();
+        taskService.deleteTask(id, accountDetails.getUser());
         return ResponseEntity.noContent().build();
+    }
+
+    private AccountDetailsAdapter getAccountDetails() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return (AccountDetailsAdapter) authentication.getPrincipal();
     }
 }

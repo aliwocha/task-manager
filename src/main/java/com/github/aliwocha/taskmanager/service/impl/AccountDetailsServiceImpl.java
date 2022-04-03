@@ -52,20 +52,6 @@ public class AccountDetailsServiceImpl implements AccountDetailsService, UserDet
         return sendConfirmationEmail(user);
     }
 
-    private void checkIfUserNotDuplicated(User user) {
-        Optional<User> userByLogin = userRepository.findByLoginIgnoreCase(user.getLogin());
-        if (userByLogin.isPresent()) {
-            throw new DuplicateUserException();
-        }
-    }
-
-    private void checkIfEmailNotDuplicated(User user) {
-        Optional<User> userByEmail = userRepository.findByEmailIgnoreCase(user.getEmail());
-        if (userByEmail.isPresent()) {
-            throw new DuplicateEmailException();
-        }
-    }
-
     @Override
     public void enableUser(User user) {
         userRepository.findByEmailIgnoreCase(user.getEmail()).ifPresent(u -> u.setEnabled(true));
@@ -82,6 +68,20 @@ public class AccountDetailsServiceImpl implements AccountDetailsService, UserDet
         verifyUser(email, user);
 
         return sendConfirmationEmail(user);
+    }
+
+    private void checkIfUserNotDuplicated(User user) {
+        Optional<User> userByLogin = userRepository.findByLoginIgnoreCase(user.getLogin());
+        if (userByLogin.isPresent()) {
+            throw new DuplicateUserException();
+        }
+    }
+
+    private void checkIfEmailNotDuplicated(User user) {
+        Optional<User> userByEmail = userRepository.findByEmailIgnoreCase(user.getEmail());
+        if (userByEmail.isPresent()) {
+            throw new DuplicateEmailException();
+        }
     }
 
     private void verifyUser(String email, User user) {

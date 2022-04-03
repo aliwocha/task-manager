@@ -52,6 +52,11 @@ public class RegistrationServiceImpl implements RegistrationService {
         return String.format("Email '%s' confirmed", confirmationToken.getUser().getEmail());
     }
 
+    @Override
+    public ConfirmationTokenResponse resendConfirmationEmail(RegistrationRequest registrationRequest) {
+        return accountDetailsService.resendConfirmationEmail(registrationRequest.getLogin(), registrationRequest.getEmail());
+    }
+
     private void checkIfEmailAlreadyConfirmed(ConfirmationToken confirmationToken) {
         if (confirmationToken.getConfirmedAt() != null) {
             throw new EmailAlreadyConfirmedException();
@@ -62,10 +67,5 @@ public class RegistrationServiceImpl implements RegistrationService {
         if (expiresAt.isBefore(LocalDateTime.now())) {
             throw new TokenExpiredException();
         }
-    }
-
-    @Override
-    public ConfirmationTokenResponse resendConfirmationEmail(RegistrationRequest registrationRequest) {
-        return accountDetailsService.resendConfirmationEmail(registrationRequest.getLogin(), registrationRequest.getEmail());
     }
 }

@@ -36,6 +36,7 @@ public class CategoryController {
         return ResponseEntity.ok(categoryService.getNames());
     }
 
+    // TODO: Change this to return Category and rename to getCategory
     @ApiOperation(value = "Get category name by id")
     @GetMapping("/{id}")
     public ResponseEntity<String> getCategoryName(@PathVariable Long id) {
@@ -44,6 +45,7 @@ public class CategoryController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    // TODO: Move this endpoint to TaskController and rename to getTasksByCategory
     @ApiOperation(value = "Get tasks by category id")
     @GetMapping("/{categoryId}/tasks")
     public ResponseEntity<List<TaskResponse>> getCategoryTasks(@PathVariable Long categoryId) {

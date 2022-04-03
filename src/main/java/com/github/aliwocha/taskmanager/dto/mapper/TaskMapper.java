@@ -18,12 +18,10 @@ public class TaskMapper {
 
     private final CategoryRepository categoryRepository;
     private final UserRepository userRepository;
-    private final UserMapper userMapper;
 
-    public TaskMapper(CategoryRepository categoryRepository, UserRepository userRepository, UserMapper userMapper) {
+    public TaskMapper(CategoryRepository categoryRepository, UserRepository userRepository) {
         this.categoryRepository = categoryRepository;
         this.userRepository = userRepository;
-        this.userMapper = userMapper;
     }
 
     public TaskResponse toDto(Task task) {
@@ -42,7 +40,7 @@ public class TaskMapper {
         taskResponse.setDeadline(task.getDeadline());
 
         if (task.getUser() != null) {
-            taskResponse.setUserResponse(userMapper.toDto(task.getUser()));
+            taskResponse.setUserId(task.getUser().getId());
         }
 
         return taskResponse;

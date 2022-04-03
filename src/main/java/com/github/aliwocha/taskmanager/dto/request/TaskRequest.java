@@ -23,14 +23,11 @@ public class TaskRequest {
     private String category;
 
     @NotNull(message = "Priority cannot be null")
-    @Size(max = 50, message = "Priority must have max 50 characters")
     private Task.Priority priority;
 
     @NotNull(message = "Status cannot be null")
-    @Size(max = 50, message = "Status must have max 50 characters")
     private Task.Status status;
 
-    @Size(max = 50, message = "Deadline must have max 50 characters")
     private LocalDate deadline;
 
     @NotNull(message = "User id cannot be null")

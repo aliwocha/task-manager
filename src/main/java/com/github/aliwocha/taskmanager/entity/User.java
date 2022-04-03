@@ -39,12 +39,12 @@ public class User {
     @Column(name = "registration_date", length = 50, nullable = false)
     private Timestamp registrationDate;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "role_id")
     private Role role;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
-    private List<Task> tasks = new ArrayList<>();
+    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER, cascade = CascadeType.REMOVE)
+    private final List<Task> tasks = new ArrayList<>();
 
     public Long getId() {
         return id;
@@ -104,10 +104,6 @@ public class User {
 
     public List<Task> getTasks() {
         return tasks;
-    }
-
-    public void setTasks(List<Task> tasks) {
-        this.tasks = tasks;
     }
 
     @Override

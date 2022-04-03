@@ -44,24 +44,26 @@ public class UserServiceImpl implements UserService {
         return mapAndSaveUser(userRequest);
     }
 
-    private void checkIfUserNotDuplicated(UserRequest userRequest) {
-        Optional<User> userByLogin = userRepository.findByLoginIgnoreCase(userRequest.getLogin());
-        if (userByLogin.isPresent()) {
-            throw new DuplicateUserException();
-        }
-    }
-
-    private UserResponse mapAndSaveUser(UserRequest userRequest) {
-        User user = userMapper.toEntity(userRequest);
-        User savedUser = userRepository.save(user);
-        return userMapper.toDto(savedUser);
-    }
-
     @Override
     public UserResponse updateUser(UserRequest userRequest, Long id) {
         User user = userRepository.findById(id).orElseThrow(UserNotFoundException::new);
         checkIfUserNotDuplicated(userRequest, id);
         return updateAndSaveUser(user, userRequest);
+    }
+
+    @Override
+    public void deleteUser(Long id) {
+        if (!userRepository.existsById(id)) {
+            throw new UserNotFoundException();
+        }
+        userRepository.deleteById(id);
+    }
+
+    private void checkIfUserNotDuplicated(UserRequest userRequest) {
+        Optional<User> userByLogin = userRepository.findByLoginIgnoreCase(userRequest.getLogin());
+        if (userByLogin.isPresent()) {
+            throw new DuplicateUserException();
+        }
     }
 
     private void checkIfUserNotDuplicated(UserRequest userRequest, Long id) {
@@ -73,18 +75,15 @@ public class UserServiceImpl implements UserService {
         });
     }
 
+    private UserResponse mapAndSaveUser(UserRequest userRequest) {
+        User user = userMapper.toEntity(userRequest);
+        User savedUser = userRepository.save(user);
+        return userMapper.toDto(savedUser);
+    }
+
     private UserResponse updateAndSaveUser(User user, UserRequest userRequest) {
         user = userMapper.updateEntity(user, userRequest);
         User updatedUser = userRepository.save(user);
         return userMapper.toDto(updatedUser);
-    }
-
-    @Override
-    public void deleteUser(Long id) {
-        if (!userRepository.existsById(id)) {
-            throw new UserNotFoundException();
-        }
-
-        userRepository.deleteById(id);
     }
 }

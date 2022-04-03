@@ -23,11 +23,11 @@ import java.util.stream.Collectors;
 @Service
 public class CategoryServiceImpl implements CategoryService {
 
+    private static final String DEFAULT_CATEGORY_NAME = "No category";
+
     private final CategoryRepository categoryRepository;
     private final TaskRepository taskRepository;
     private final TaskMapper taskMapper;
-
-    private static final String DEFAULT_CATEGORY_NAME = "No category";
 
     public CategoryServiceImpl(CategoryRepository categoryRepository, TaskRepository taskRepository, TaskMapper taskMapper) {
         this.categoryRepository = categoryRepository;
@@ -64,19 +64,7 @@ public class CategoryServiceImpl implements CategoryService {
         return mapAndSaveCategory(categoryRequest);
     }
 
-    private void checkIfCategoryNotDuplicated(CategoryRequest categoryRequest) {
-        Optional<Category> categoryByName = categoryRepository.findByNameIgnoreCase(categoryRequest.getCategoryName());
-        if (categoryByName.isPresent()) {
-            throw new DuplicateCategoryException();
-        }
-    }
-
-    private CategoryResponse mapAndSaveCategory(CategoryRequest categoryRequest) {
-        Category category = CategoryMapper.toEntity(categoryRequest);
-        Category savedCategory = categoryRepository.save(category);
-        return CategoryMapper.toDto(savedCategory);
-    }
-
+    // TODO: This method can be marked as @Transactional and then no need to save pdated category - Hibernate will do it for us
     @Override
     public CategoryResponse updateCategory(CategoryRequest categoryRequest, Long id) {
         Category category = categoryRepository.findById(id).orElseThrow(CategoryNotFoundException::new);
@@ -85,21 +73,6 @@ public class CategoryServiceImpl implements CategoryService {
         checkIfDefaultCategoryName(category);
 
         return updateAndSaveCategory(category, categoryRequest);
-    }
-
-    private void checkIfCategoryNotDuplicated(CategoryRequest categoryRequest, Long id) {
-        Optional<Category> categoryByName = categoryRepository.findByNameIgnoreCase(categoryRequest.getCategoryName());
-        categoryByName.ifPresent(category -> {
-            if (!category.getId().equals(id)) {
-                throw new DuplicateCategoryException();
-            }
-        });
-    }
-
-    private CategoryResponse updateAndSaveCategory(Category category, CategoryRequest categoryRequest) {
-        category.setName(categoryRequest.getCategoryName());
-        Category updatedCategory = categoryRepository.save(category);
-        return CategoryMapper.toDto(updatedCategory);
     }
 
     @Override
@@ -111,10 +84,38 @@ public class CategoryServiceImpl implements CategoryService {
         categoryRepository.deleteById(id);
     }
 
+    private void checkIfCategoryNotDuplicated(CategoryRequest categoryRequest) {
+        Optional<Category> categoryByName = categoryRepository.findByNameIgnoreCase(categoryRequest.getCategoryName());
+        if (categoryByName.isPresent()) {
+            throw new DuplicateCategoryException();
+        }
+    }
+
+    private void checkIfCategoryNotDuplicated(CategoryRequest categoryRequest, Long id) {
+        Optional<Category> categoryByName = categoryRepository.findByNameIgnoreCase(categoryRequest.getCategoryName());
+        categoryByName.ifPresent(category -> {
+            if (!category.getId().equals(id)) {
+                throw new DuplicateCategoryException();
+            }
+        });
+    }
+
     private void checkIfDefaultCategoryName(Category category) {
         if (category.getName().equals(DEFAULT_CATEGORY_NAME)) {
             throw new CategoryForbiddenException("This category cannot be updated");
         }
+    }
+
+    private CategoryResponse mapAndSaveCategory(CategoryRequest categoryRequest) {
+        Category category = CategoryMapper.toEntity(categoryRequest);
+        Category savedCategory = categoryRepository.save(category);
+        return CategoryMapper.toDto(savedCategory);
+    }
+
+    private CategoryResponse updateAndSaveCategory(Category category, CategoryRequest categoryRequest) {
+        category.setName(categoryRequest.getCategoryName());
+        Category updatedCategory = categoryRepository.save(category);
+        return CategoryMapper.toDto(updatedCategory);
     }
 
     private void updateTasksBeforeDelete(Long id) {
