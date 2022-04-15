@@ -1,8 +1,6 @@
 # **Task Manager**
 
-The app allows adding, editing and deleting tasks, changing statuses and priorities, loading and saving data in the database, as well as authentication and registration of users. I am currently developing the backend part. Frontend will be written in the future. Both layers will be communicating using REST API.
-
-**The applications is _IN PROGRESS_**. 
+The app allows adding, editing and deleting tasks, changing statuses and priorities, loading and saving data in the database, as well as authentication and registration of users.
 
 Functionalities implemented so far:
 * endpoints with CRUD methods for all entities
@@ -15,10 +13,11 @@ Functionalities implemented so far:
 * pagination
 * authentication and authorization by Spring Security
 * sending emails with confirmation links
+* one-to-many relation between users and tasks (each user can see his own tasks list)
 
 Functionalities to be implemented:
-* one-to-many relation between users and tasks (each user can see his own tasks list)
 * integration with MySQL or PostgreSQL
+* adding JWT authentication  
 * deployment to the public server (e.g. Heroku)
 * unit tests
 
