@@ -11,8 +11,6 @@ import com.github.aliwocha.taskmanager.repository.CategoryRepository;
 import com.github.aliwocha.taskmanager.repository.UserRepository;
 import org.springframework.stereotype.Component;
 
-import java.util.Optional;
-
 @Component
 public class TaskMapper {
 
@@ -52,15 +50,16 @@ public class TaskMapper {
         task.setTitle(taskRequest.getTitle());
         task.setDescription(taskRequest.getDescription());
 
-        Optional<Category> category = categoryRepository.findByNameIgnoreCase(taskRequest.getCategory());
-        category.ifPresentOrElse(task::setCategory, CategoryNotFoundException::new);
-
+        Category category = categoryRepository.findById(taskRequest.getCategoryId())
+                .orElseThrow(CategoryNotFoundException::new);
+        task.setCategory(category);
         task.setPriority(taskRequest.getPriority());
         task.setStatus(taskRequest.getStatus());
         task.setDeadline(taskRequest.getDeadline());
 
-        Optional<User> user = userRepository.findById(taskRequest.getUserId());
-        user.ifPresentOrElse(task::setUser, UserNotFoundException::new);
+        User user = userRepository.findById(taskRequest.getUserId())
+                .orElseThrow(UserNotFoundException::new);
+        task.setUser(user);
 
         return task;
     }
@@ -69,15 +68,16 @@ public class TaskMapper {
         task.setTitle(taskRequest.getTitle());
         task.setDescription(taskRequest.getDescription());
 
-        Optional<Category> category = categoryRepository.findByNameIgnoreCase(taskRequest.getCategory());
-        category.ifPresentOrElse(task::setCategory, CategoryNotFoundException::new);
-
+        Category category = categoryRepository.findById(taskRequest.getCategoryId())
+                .orElseThrow(CategoryNotFoundException::new);
+        task.setCategory(category);
         task.setPriority(taskRequest.getPriority());
         task.setStatus(taskRequest.getStatus());
         task.setDeadline(taskRequest.getDeadline());
 
-        Optional<User> user = userRepository.findById(taskRequest.getUserId());
-        user.ifPresentOrElse(task::setUser, UserNotFoundException::new);
+        User user = userRepository.findById(taskRequest.getUserId())
+                .orElseThrow(UserNotFoundException::new);
+        task.setUser(user);
 
         return task;
     }

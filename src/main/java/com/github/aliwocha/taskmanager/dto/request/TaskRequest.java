@@ -18,9 +18,10 @@ public class TaskRequest {
     @Size(max = 1000, message = "Description must have max 1000 characters")
     private String description;
 
-    @NotBlank(message = "Category is mandatory")
-    @Size(max = 50, message = "Category must have max 50 characters")
-    private String category;
+    @NotNull(message = "Category id cannot be null")
+    @Digits(integer = 4, fraction = 0, message = "Invalid number format")
+    @Min(value = 1, message = "Category id must be greater or equal to 1")
+    private Long categoryId;
 
     @NotNull(message = "Priority cannot be null")
     private Task.Priority priority;
@@ -32,7 +33,7 @@ public class TaskRequest {
 
     @NotNull(message = "User id cannot be null")
     @Digits(integer = 4, fraction = 0, message = "Invalid number format")
-    @Min(value = 0, message = "User id must be greater or equal to 0")
+    @Min(value = 1, message = "User id must be greater or equal to 1")
     private Long userId;
 
     public String getTitle() {
@@ -51,12 +52,12 @@ public class TaskRequest {
         this.description = description;
     }
 
-    public String getCategory() {
-        return category;
+    public Long getCategoryId() {
+        return categoryId;
     }
 
-    public void setCategory(String category) {
-        this.category = category;
+    public void setCategoryId(Long categoryId) {
+        this.categoryId = categoryId;
     }
 
     public Task.Priority getPriority() {

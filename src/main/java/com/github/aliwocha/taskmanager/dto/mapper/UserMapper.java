@@ -10,7 +10,6 @@ import org.springframework.stereotype.Component;
 
 import java.sql.Timestamp;
 import java.time.Instant;
-import java.util.Optional;
 
 @Component
 public class UserMapper {
@@ -47,8 +46,9 @@ public class UserMapper {
         user.setEnabled(false);
         user.setRegistrationDate(Timestamp.from(Instant.now()));
 
-        Optional<Role> role = roleRepository.findByNameIgnoreCase(userRequest.getRole());
-        role.ifPresentOrElse(user::setRole, RoleNotFoundException::new);
+        Role role = roleRepository.findByNameIgnoreCase(userRequest.getRole())
+                .orElseThrow(RoleNotFoundException::new);
+        user.setRole(role);
 
         return user;
     }
@@ -58,8 +58,9 @@ public class UserMapper {
         user.setPassword(userRequest.getPassword());
         user.setEmail(userRequest.getEmail());
 
-        Optional<Role> role = roleRepository.findByNameIgnoreCase(userRequest.getRole());
-        role.ifPresentOrElse(user::setRole, RoleNotFoundException::new);
+        Role role = roleRepository.findByNameIgnoreCase(userRequest.getRole())
+                .orElseThrow(RoleNotFoundException::new);
+        user.setRole(role);
 
         return user;
     }

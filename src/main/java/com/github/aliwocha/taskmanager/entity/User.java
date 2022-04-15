@@ -1,19 +1,14 @@
 package com.github.aliwocha.taskmanager.entity;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
 @Entity
@@ -42,9 +37,6 @@ public class User {
     @ManyToOne
     @JoinColumn(name = "role_id")
     private Role role;
-
-    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER, cascade = CascadeType.REMOVE)
-    private final List<Task> tasks = new ArrayList<>();
 
     public Long getId() {
         return id;
@@ -100,10 +92,6 @@ public class User {
 
     public void setRole(Role role) {
         this.role = role;
-    }
-
-    public List<Task> getTasks() {
-        return tasks;
     }
 
     @Override
