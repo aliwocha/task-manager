@@ -10,9 +10,11 @@ import java.util.Optional;
 
 public interface TaskService {
 
-    Page<TaskResponse> getTasksPaginated(User user, Pageable pageable);
+    Page<TaskResponse> getTasks(User user, Pageable pageable);
 
-    Page<TaskResponse> getTasksByStatusPaginated(String status, User user, Pageable pageable);
+    Page<TaskResponse> getTasksByStatus(String status, User user, Pageable pageable);
+
+    Page<TaskResponse> getTasksByCategoryId(Long categoryId, User user, Pageable pageable);
 
     Optional<TaskResponse> getTask(Long id, User user);
 

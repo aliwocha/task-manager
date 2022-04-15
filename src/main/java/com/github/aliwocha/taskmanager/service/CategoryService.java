@@ -2,18 +2,15 @@ package com.github.aliwocha.taskmanager.service;
 
 import com.github.aliwocha.taskmanager.dto.request.CategoryRequest;
 import com.github.aliwocha.taskmanager.dto.response.CategoryResponse;
-import com.github.aliwocha.taskmanager.dto.response.TaskResponse;
 
 import java.util.List;
 import java.util.Optional;
 
 public interface CategoryService {
 
-    List<String> getNames();
+    List<CategoryResponse> getCategories();
 
-    Optional<String> getCategoryName(Long id);
-
-    List<TaskResponse> getCategoryTasks(Long categoryId);
+    Optional<CategoryResponse> getCategory(Long id);
 
     CategoryResponse addCategory(CategoryRequest categoryRequest);
 

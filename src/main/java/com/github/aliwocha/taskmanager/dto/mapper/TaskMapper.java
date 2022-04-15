@@ -32,7 +32,7 @@ public class TaskMapper {
         taskResponse.setDescription(task.getDescription());
 
         if (task.getCategory() != null) {
-            taskResponse.setCategory(task.getCategory().getName());
+            taskResponse.setCategory(CategoryMapper.toDto(task.getCategory()));
         }
 
         taskResponse.setPriority(task.getPriority());

@@ -36,17 +36,27 @@ public class TaskController {
         this.taskService = taskService;
     }
 
-    @ApiOperation(value = "Get all tasks paginated", notes = "Specify additional parameters to adjust page no., page size, offset etc.")
+    @ApiOperation(value = "Get all tasks or tasks by status (optional)", notes = "Add param \"status\" to filter tasks by status. "
+            + "Specify additional parameters to adjust page no., page size, offset etc.")
     @GetMapping
-    public ResponseEntity<Page<TaskResponse>> getTasksPaginated(@RequestParam(required = false) String status,
-                                                                @SortDefault(sort = "deadline")
-                                                                @PageableDefault Pageable pageable) {
+    public ResponseEntity<Page<TaskResponse>> getTasks(@RequestParam(required = false) String status,
+                                                       @SortDefault(sort = "deadline")
+                                                       @PageableDefault Pageable pageable) {
         AccountDetailsAdapter accountDetails = getAccountDetails();
         if (status != null) {
-            return ResponseEntity.ok(taskService.getTasksByStatusPaginated(status, accountDetails.getUser(), pageable));
+            return ResponseEntity.ok(taskService.getTasksByStatus(status, accountDetails.getUser(), pageable));
         } else {
-            return ResponseEntity.ok(taskService.getTasksPaginated(accountDetails.getUser(), pageable));
+            return ResponseEntity.ok(taskService.getTasks(accountDetails.getUser(), pageable));
         }
+    }
+
+    @ApiOperation(value = "Get tasks by category id")
+    @GetMapping("/category/{categoryId}")
+    public ResponseEntity<Page<TaskResponse>> getTasksByCategoryId(@PathVariable Long categoryId,
+                                                                   @SortDefault(sort = "deadline")
+                                                                   @PageableDefault Pageable pageable) {
+        AccountDetailsAdapter accountDetails = getAccountDetails();
+        return ResponseEntity.ok(taskService.getTasksByCategoryId(categoryId, accountDetails.getUser(), pageable));
     }
 
     @ApiOperation(value = "Get task by id")

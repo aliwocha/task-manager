@@ -3,11 +3,14 @@ package com.github.aliwocha.taskmanager.service.impl;
 import com.github.aliwocha.taskmanager.dto.mapper.TaskMapper;
 import com.github.aliwocha.taskmanager.dto.request.TaskRequest;
 import com.github.aliwocha.taskmanager.dto.response.TaskResponse;
+import com.github.aliwocha.taskmanager.entity.Category;
 import com.github.aliwocha.taskmanager.entity.Task;
 import com.github.aliwocha.taskmanager.entity.User;
+import com.github.aliwocha.taskmanager.exception.category.CategoryNotFoundException;
 import com.github.aliwocha.taskmanager.exception.task.InvalidTaskException;
 import com.github.aliwocha.taskmanager.exception.task.TaskNotFoundException;
 import com.github.aliwocha.taskmanager.exception.user.ForbiddenAccessException;
+import com.github.aliwocha.taskmanager.repository.CategoryRepository;
 import com.github.aliwocha.taskmanager.repository.TaskRepository;
 import com.github.aliwocha.taskmanager.service.TaskService;
 import org.springframework.data.domain.Page;
@@ -27,15 +30,17 @@ public class TaskServiceImpl implements TaskService {
     private static final String ROLE_USER = "ROLE_USER";
 
     private final TaskRepository taskRepository;
+    private final CategoryRepository categoryRepository;
     private final TaskMapper taskMapper;
 
-    public TaskServiceImpl(TaskRepository taskRepository, TaskMapper taskMapper) {
+    public TaskServiceImpl(TaskRepository taskRepository, CategoryRepository categoryRepository, TaskMapper taskMapper) {
         this.taskRepository = taskRepository;
+        this.categoryRepository = categoryRepository;
         this.taskMapper = taskMapper;
     }
 
     @Override
-    public Page<TaskResponse> getTasksPaginated(User user, Pageable pageable) {
+    public Page<TaskResponse> getTasks(User user, Pageable pageable) {
         Page<Task> taskPage = fetchTasks(user, pageable);
         List<TaskResponse> tasks = fetchTasks(user, pageable).getContent()
                 .stream()
@@ -46,7 +51,7 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public Page<TaskResponse> getTasksByStatusPaginated(String status, User user, Pageable pageable) {
+    public Page<TaskResponse> getTasksByStatus(String status, User user, Pageable pageable) {
         List<String> statusNames = prepareStatusNamesList();
         if (!statusNames.contains(status.toUpperCase())) {
             throw new InvalidTaskException("Invalid status name");
@@ -59,6 +64,20 @@ public class TaskServiceImpl implements TaskService {
                 .collect(Collectors.toList());
 
         return new PageImpl<>(tasksByStatus, pageable, taskPage.getTotalElements());
+    }
+
+    @Override
+    public Page<TaskResponse> getTasksByCategoryId(Long categoryId, User user, Pageable pageable) {
+        Category category = categoryRepository.findById(categoryId)
+                .orElseThrow(CategoryNotFoundException::new);
+
+        Page<Task> taskPage = fetchTasksByCategory(category, user, pageable);
+        List<TaskResponse> tasksByCategory = taskPage.getContent()
+                .stream()
+                .map(taskMapper::toDto)
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(tasksByCategory, pageable, taskPage.getTotalElements());
     }
 
     @Override
@@ -113,6 +132,13 @@ public class TaskServiceImpl implements TaskService {
             return taskRepository.findAllByStatusAndUser_Id(getStatus(status), user.getId(), pageable);
         }
         return taskRepository.findAllByStatus(getStatus(status), pageable);
+    }
+
+    private Page<Task> fetchTasksByCategory(Category category, User user, Pageable pageable) {
+        if (user.getRole().getName().equals(ROLE_USER)) {
+            return taskRepository.findAllByCategoryAndUser_Id(category, user.getId(), pageable);
+        }
+        return taskRepository.findAllByCategory(category, pageable);
     }
 
     private List<String> prepareStatusNamesList() {

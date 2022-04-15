@@ -2,7 +2,6 @@ package com.github.aliwocha.taskmanager.controller;
 
 import com.github.aliwocha.taskmanager.dto.request.CategoryRequest;
 import com.github.aliwocha.taskmanager.dto.response.CategoryResponse;
-import com.github.aliwocha.taskmanager.dto.response.TaskResponse;
 import com.github.aliwocha.taskmanager.service.impl.CategoryServiceImpl;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.ResponseEntity;
@@ -30,26 +29,18 @@ public class CategoryController {
         this.categoryService = categoryService;
     }
 
-    @ApiOperation(value = "Get all category names")
-    @GetMapping("/names")
-    public ResponseEntity<List<String>> getNames() {
-        return ResponseEntity.ok(categoryService.getNames());
+    @ApiOperation(value = "Get all categories")
+    @GetMapping
+    public ResponseEntity<List<CategoryResponse>> getCategories() {
+        return ResponseEntity.ok(categoryService.getCategories());
     }
 
-    // TODO: Change this to return Category and rename to getCategory
-    @ApiOperation(value = "Get category name by id")
+    @ApiOperation(value = "Get category by id")
     @GetMapping("/{id}")
-    public ResponseEntity<String> getCategoryName(@PathVariable Long id) {
-        return categoryService.getCategoryName(id)
+    public ResponseEntity<CategoryResponse> getCategory(@PathVariable Long id) {
+        return categoryService.getCategory(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
-    }
-
-    // TODO: Move this endpoint to TaskController and rename to getTasksByCategory
-    @ApiOperation(value = "Get tasks by category id")
-    @GetMapping("/{categoryId}/tasks")
-    public ResponseEntity<List<TaskResponse>> getCategoryTasks(@PathVariable Long categoryId) {
-        return ResponseEntity.ok(categoryService.getCategoryTasks(categoryId));
     }
 
     @ApiOperation(value = "Add category")

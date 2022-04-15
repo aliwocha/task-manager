@@ -1,10 +1,8 @@
 package com.github.aliwocha.taskmanager.service.impl;
 
 import com.github.aliwocha.taskmanager.dto.mapper.CategoryMapper;
-import com.github.aliwocha.taskmanager.dto.mapper.TaskMapper;
 import com.github.aliwocha.taskmanager.dto.request.CategoryRequest;
 import com.github.aliwocha.taskmanager.dto.response.CategoryResponse;
-import com.github.aliwocha.taskmanager.dto.response.TaskResponse;
 import com.github.aliwocha.taskmanager.entity.Category;
 import com.github.aliwocha.taskmanager.exception.category.CategoryForbiddenException;
 import com.github.aliwocha.taskmanager.exception.category.CategoryNotFoundException;
@@ -27,35 +25,23 @@ public class CategoryServiceImpl implements CategoryService {
 
     private final CategoryRepository categoryRepository;
     private final TaskRepository taskRepository;
-    private final TaskMapper taskMapper;
 
-    public CategoryServiceImpl(CategoryRepository categoryRepository, TaskRepository taskRepository, TaskMapper taskMapper) {
+    public CategoryServiceImpl(CategoryRepository categoryRepository, TaskRepository taskRepository) {
         this.categoryRepository = categoryRepository;
         this.taskRepository = taskRepository;
-        this.taskMapper = taskMapper;
     }
 
     @Override
-    public List<String> getNames() {
+    public List<CategoryResponse> getCategories() {
         return categoryRepository.findAll()
                 .stream()
-                .map(Category::getName)
+                .map(CategoryMapper::toDto)
                 .collect(Collectors.toList());
     }
 
     @Override
-    public Optional<String> getCategoryName(Long id) {
-        return categoryRepository.findById(id).map(Category::getName);
-    }
-
-    @Override
-    public List<TaskResponse> getCategoryTasks(Long categoryId) {
-        return categoryRepository.findById(categoryId)
-                .map(Category::getTasks)
-                .orElseThrow(CategoryNotFoundException::new)
-                .stream()
-                .map(taskMapper::toDto)
-                .collect(Collectors.toList());
+    public Optional<CategoryResponse> getCategory(Long id) {
+        return categoryRepository.findById(id).map(CategoryMapper::toDto);
     }
 
     @Override
@@ -64,7 +50,6 @@ public class CategoryServiceImpl implements CategoryService {
         return mapAndSaveCategory(categoryRequest);
     }
 
-    // TODO: This method can be marked as @Transactional and then no need to save pdated category - Hibernate will do it for us
     @Override
     public CategoryResponse updateCategory(CategoryRequest categoryRequest, Long id) {
         Category category = categoryRepository.findById(id).orElseThrow(CategoryNotFoundException::new);

@@ -11,7 +11,7 @@ public class TaskResponse {
     private Long id;
     private String title;
     private String description;
-    private String category;
+    private CategoryResponse category;
     private Task.Priority priority;
     private Task.Status status;
     private LocalDate deadline;
@@ -41,11 +41,11 @@ public class TaskResponse {
         this.description = description;
     }
 
-    public String getCategory() {
+    public CategoryResponse getCategory() {
         return category;
     }
 
-    public void setCategory(String category) {
+    public void setCategory(CategoryResponse category) {
         this.category = category;
     }
 
